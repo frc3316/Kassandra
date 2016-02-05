@@ -1,4 +1,4 @@
-html,body{
+html, body {
   height:100%;
 }
 
@@ -7,10 +7,10 @@ html,body{
   overflow-y: auto;
 }
 .batter-background {
-    padding: 1em;
-    background: url(batter-and-region.svg);
-	background-size: cover;
-    /* background-repeat: no-repeat; */
+    background: url(../svg/field.svg);
+    background-position: right;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .defence-row {
