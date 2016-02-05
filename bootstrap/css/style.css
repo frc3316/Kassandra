@@ -1,0 +1,32 @@
+html,body{
+  height:100%;
+}
+
+.halves {
+  height: 100%;
+  overflow-y: auto;
+}
+.batter-background {
+    padding: 1em;
+    background-image: url(http://upload.wikimedia.org/wikipedia/commons/8/84/Konqi_svg.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.defence-row {
+  padding: 0.5em;
+  background-color: #999;
+}
+
+.defence-row-stat {
+  background-color: #ddd;
+}
+
+.defence-row-kind {
+  background-color: #ccc;
+}
+
+.defence-picture {
+  margin-top: 5%;
+  margin: auto;
+}
