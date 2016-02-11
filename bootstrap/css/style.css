@@ -7,7 +7,7 @@ html, body {
   overflow-y: auto;
 }
 .batter-background {
-    background: url(../svg/field.svg);
+    background: url("../img/field.svg");
     background-position: right;
     background-size: contain;
     background-clip: content-box;
@@ -43,12 +43,9 @@ html, body {
   margin-top: 5%;
 }
 
-.defence-type {
-  margin: 0.2em 0.2em -5em -5em;
+.defence-category {
   font-weight: bold;
-  font-size: 10vh;
-  z-index: -5;
-  opacity: 0.5;
+  font-size: 15vh;
 }
 .thumbnail>img {
   height: 16vh;
