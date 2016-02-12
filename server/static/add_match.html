@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+			<title>Kassandra - Match Entry</title>
+			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+				<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+					<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+				</head>
+				<body ng-app="formExample">
+					<div class="container-fluid" ng-controller="KassandraController">
+						<h1>Kassandra - Match Entry</h1>
+						<form novalidate role="form" name="form" class="simple-form" ng-submit="processForm()">
+							<div class="row">
+								<div class="col-xs-6 form-group" ng-class="{ 'has-error': form.match.$invalid }">
+									<label class="control-label" for="match">Match:</label>
+									<input class="form-control" type="text" list="matchlist" ng-model="match" size="4" name="match" find-match />
+									<datalist id="matchlist">
+										<option ng-repeat="(matchname, alliances) in matches" value="{{matchname}}"/>
+									</datalist>
+								</div>
+								
+								<div class="col-xs-6 form-group">
+									<label class="control-label" for="team">Team:</label>
+									<select class="form-control" ng-model="team" name="team" ng-disabled="!match||form.match.$error.ValidMatch" ng-change="updateAlliance()">
+										<optgroup label="Red Alliance">
+											<option ng-repeat="team in matches[match]['red']" value="{{team}}">{{team}}</option>
+										</optgroup>
+										<optgroup label="Blue Alliance">
+											<option ng-repeat="team in matches[match]['blue']" value="{{team}}">{{team}}</option>
+										</optgroup>
+									</select>
+								</div>
+							</div>
+							
+							<div class="col-sm-6" ng-show="team">
+								<h2>Breaching</h2>
+								<div class="row">
+									<div class="col-xs-4"><label>Defence</label></div>
+									<div class="col-xs-4"><label>Success</label></div>
+									<div class="col-xs-4"><label>Failure</label></div>
+								</div>
+								<div class="row" ng-repeat="(name, stats) in breaching">
+									<div class="form-group" name="{{name}}_defence">
+										<div class="col-xs-4"><label class="control-label" for="{{name}}_success {{name}}_failure">{{ name }}:</label></div>
+										<div class="col-xs-4">
+											<input class="form-control" type="number" name="{{name}}_success" min="0" max="10" ng-model="stats.success" />
+										</div>
+										<div class="col-xs-4">
+											<input class="form-control" type="number" name="{{name}}_failure" min="0" max="10" ng-model="stats.failure" />
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="col-sm-6" ng-show="team">
+								<h2>Shooting</h2>
+								<div class="row">
+									<div class="col-xs-4"><label>Goal</label></div>
+									<div class="col-xs-4"><label>Success</label></div>
+									<div class="col-xs-4"><label>Failure</label></div>
+								</div>
+								<div class="row form-group" name="low_goal_close">
+									<div class="col-xs-4"><label class="control-label" for="low_goal_close_success low_goal_close_failure">Low Close</label></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="low_goal_close_success" ng-model="shooting.low.close.success" /></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="low_goal_close_failure" ng-model="shooting.low.close.failure" /></div>
+								</div>
+								<div class="row form-group" name="low_goal_far">
+									<div class="col-xs-4"><label class="control-label" for="low_goal_far_success low_goal_far_failure">Low Far</label></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="low_goal_far_success" ng-model="shooting.low.far.success" /></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="low_goal_far_failure" ng-model="shooting.low.far.failure" /></div>
+								</div>
+								<div class="row form-group" name="high_goal_close">
+									<div class="col-xs-4"><label class="control-label" for="high_goal_close_success high_goal_close_failure">High Close</label></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="high_goal_close_success" ng-model="shooting.high.close.success" /></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="high_goal_close_failure" ng-model="shooting.high.close.failure" /></div>
+								</div>
+								<div class="row form-group" name="high_goal_far">
+									<div class="col-xs-4"><label class="control-label" for="high_goal_far_success high_goal_far_failure">High Far</label></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="high_goal_far_success" ng-model="shooting.high.far.success" /></div>
+									<div class="col-xs-4"><input class="form-control" type="number" min="0" max="10" name="high_goal_far_failure" ng-model="shooting.high.far.failure" /></div>
+								</div>
+							</div>
+							
+							<div class="col-sm-6" ng-show="team">
+								<h2>Collection</h2>
+								<div class="row">
+									<div class="col-xs-6 form-group">
+										<label class="control-label" for="collection_floor">From Floor</label>
+										<input class="form-control" type="number" min="0" max="10" name="collection_floor" ng-model="collection.floor" />
+									</div>
+									<div class="col-xs-6 form-group">
+										<label class="control-label" for="collection_hp">From HP</label>
+										<input class="form-control" type="number" min="0" max="10" name="collection_hp" ng-model="collection.hp" />
+									</div>
+								</div>
+							</div>
+							
+							<div class="col-sm-6 form-group" ng-show="team">
+								<h2>End Game</h2>
+								<div class="row">
+									<div class="col-xs-6 form-group">
+										<label class="control-label" for="end_game_challenge">Challenge</label>
+										<input class="form-control" type="checkbox" name="end_game_challenge" ng-disabled="end_game.scale" ng-model="end_game.challenge" />
+									</div>
+									<div class="col-xs-6 form-group">
+										<label class="control-label" for="end_game_scale">Scale</label>
+										<input class="form-control" type="checkbox" name="end_game_scale" ng-model="end_game.scale" ng-click="end_game.challenge = !end_game.scale&&end_game.scale" />
+									</div>
+								</div>
+							</div>
+							
+							<div class="col-sm-12 form-group" ng-show="team">
+								<h2>Defence</h2>
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="row" ng-repeat="defence in defences">
+											<div class="col-xs-5">{{defence.tactic}}</div>
+											<div class="col-xs-5">#{{defence.team}}</div>
+											<div class="col-xs-2"><input value="delete" type="button" ng-click="removeDefence($index)" /></div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="row">
+											<div class="col-xs-5"><input list="defence" class="form-control" ng-model="newDefence.tactic" placeholder="tactic" /></div>
+											<datalist id="defence">
+												<option ng-repeat="tactic in tactics" value="{{tactic}}"/>
+											</datalist>
+											<div class="col-xs-5"><input class="form-control" type="number" min="1" max="7000" list="teams" ng-model="newDefence.team" placeholder="on team" /></div>
+											<datalist id="teams">
+												<option ng-repeat="opponent in matches[match][opposition]">{{opponent}}</option>
+											</datalist>
+											<div class="col-xs-2"><input type="button" value="Add" ng-click="addDefence()" /></div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<input type="submit" />
+						</form>
+					</div>
+					
+					<script>
+			angular.module('formExample', [])
+			.controller('KassandraController', function ($scope, $http) {
+						/* General Data */
+						$http.get("/matches")
+						.then(function(response) {
+							$scope.matches = response.data;
+						});
+						$scope.tactics = ['Pinning', 'T-Boning', 'Harrasing', 'Shot Blocking'];
+						
+						/* Form match data */ 
+						$scope.match = '';
+						$scope.team = '';
+						$scope.alliance = '';
+						$scope.opposition = '';
+						$scope.breaching = {
+							'a1' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'a2' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'b1' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'b2' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'c1' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'c2' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'c1_assist' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'c2_assist' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'd1' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'd2' : {
+								'success' : 0,
+								'failure' : 0
+							},
+							'lb' : {
+								'success' : 0,
+								'failure' : 0
+							}
+						};
+						$scope.shooting = {
+							'low' : {
+								'far' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'close' : {
+									'success' : 0,
+									'failure' : 0
+								}
+							},
+							'high' : {
+								'far' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'close' : {
+									'success' : 0,
+									'failure' : 0
+								}
+							}
+						};
+						$scope.collection = {
+							'floor': 0,
+							'hp': 0
+						};
+						$scope.end_game = {
+							'challenge': false,
+							'scale': false,
+						};
+						$scope.defences = [];
+						
+						/* Methods */ 
+						// Add new defensive tactic to `defences`
+						$scope.addDefence = function () {
+							$scope.defences.push($scope.newDefence);
+							$scope.newDefence = {};
+						}
+						
+						// Remove defensive tactic from `defences` by index
+						$scope.removeDefence = function (index) {
+							$scope.defences.splice(index, index + 1);
+						}
+						
+						// Update `alliance` and `opposition`
+						$scope.updateAlliance = function () {
+							if (!$scope.match || !$scope.team || !($scope.match in $scope.matches)) return;
+							if ($scope.matches[$scope.match]['red'].indexOf(parseInt($scope.team, 10)) != -1) {
+								$scope.alliance = 'red';
+								$scope.opposition = 'blue';
+							} else if ($scope.matches[$scope.match]['blue'].indexOf(parseInt($scope.team, 10)) != -1) {
+								$scope.alliance = 'blue';
+								$scope.opposition = 'red';
+							} else {
+								$scope.alliance = $scope.opposition = '';
+							}
+						}
+						// Process the form
+						$scope.processForm = function () {
+							var formData = {
+								'match': $scope.match,
+								'team': $scope.team,
+								'breaching': $scope.breaching,
+								'shooting': $scope.shooting,
+								'collection': $scope.collection,
+								'end_game': $scope.end_game,
+								'defences': $scope.defences
+							};
+							$http.post('/addmatch', formData, {headers: {'Content-Type': 'application/json'}})
+							.success(function (data) {
+								console.log(data);
+							});
+						};
+					}
+				)
+			.directive('findMatch', function () {
+				return {
+					require: 'ngModel',
+					link : function (scope, element, attr, mCtrl) {
+						function findMatch(value) {
+							// Find match in matches list
+							if(value == undefined) value = '';
+							var capitalized = value.toUpperCase();
+							if(capitalized !== value) {
+								mCtrl.$setViewValue(capitalized);
+								mCtrl.$render();
+							}  
+							if (scope.matches[value]) {
+								mCtrl.$setValidity('ValidMatch', true);
+							} else {
+								mCtrl.$setValidity('ValidMatch', false);
+								scope.team = '';								
+								scope.alliance = '';
+							}
+							return value;
+						}
+						mCtrl.$parsers.push(findMatch);
+					}
+				}
+			});
+					</script>
+				</body>
+			</html>
