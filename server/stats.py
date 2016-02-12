@@ -8,7 +8,7 @@ class StatsManager(object):
 	
 	def run_handlers(self, team, match_data):
 		ret_data = {}
-		[ret_data.update(handler.filter(team, match_data)) for handler in self._handlers]
+		[ret_data[handler_name] = handler.filter(team, match_data) for handler_name, handler in self._handlers.items()]
 		return ret_data
 
 		
