@@ -7,9 +7,7 @@ class StatsManager(object):
 		return handler
 	
 	def run_handlers(self, team, match_data):
-		ret_data = {}
-		[ret_data[handler_name] = handler.filter(team, match_data) for handler_name, handler in self._handlers.items()]
-		return ret_data
+		return {handler_name: handler.filter(team, match_data) for handler_name, handler in self._handlers.items()}
 
 		
 statsmgr = StatsManager()

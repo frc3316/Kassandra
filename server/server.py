@@ -3,6 +3,8 @@ import glob
 import json
 import os
 
+from stats import statsmgr
+
 app = Flask(__name__)
 
 DATABASE_DIR = "database"
@@ -19,7 +21,7 @@ def store_match(match, team, match_data):
 
 def get_team_data(team):
 	""" Fetch team's match datas from DB """
-	matches_data = [json.loads(open(match_file)) for match_file in glob.glob(os.path.join(DATABASE_DIR, '*_%s.json' % team))]
+	return [json.load(open(match_file)) for match_file in glob.glob(os.path.join(DATABASE_DIR, '*_%s.json' % team))]
 
 ## Flask Server Routes
 @app.route('/')
@@ -33,15 +35,23 @@ def get_matches():
 	data = open('static\\matches.json').read()
 	resp = Response(response=data, status=200, mimetype="application/json")
 	return resp
-	
+
 @app.route('/addmatch', methods=['POST'])
 def add_match():
 	""" handles and stores new match data """
 	match = request.json['match']
 	team = request.json['team']
 	store_match(match, team, request.json)
-	resp = Response(response=jsonify(status='OK', match=match, team=team), status=200, mimetype="application/json")
-	return resp
+	return jsonify(status='OK', match=match, team=team)
+
+@app.route('/team/<int:team_number>')
+def get_team_stats(team_number):
+	""" handles and stores new match data """
+	matches = get_team_data(team_number)
+	stats = statsmgr.run_handlers(team_number, matches)
+	#resp = Response(response='test', status=200, mimetype="application/json")
+	return jsonify(status='OK', team=team_number, stats=stats) #resp
+
 	
 if __name__ == '__main__':
 	app.debug = True
