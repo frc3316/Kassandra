@@ -1,4 +1,0 @@
-defences = [
-	{name:"Portcullis", type:"a1", successfuls:14, attempted:32, size:1, color:"active"},
-	{name:"Moat", type:"b2", successfuls:8, attempted:26, size:2, color:"success"}
-]
