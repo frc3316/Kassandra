@@ -6,15 +6,15 @@ class StatsManager(object):
 		self._handlers[handler.__name__] = handler()
 		return handler
 	
-	def run_handlers(self, team, match_data):
-		return {handler_name: handler.filter(team, match_data) for handler_name, handler in self._handlers.items()}
+	def run_handlers(self, match_data):
+		return {handler_name: handler.filter(match_data) for handler_name, handler in self._handlers.items()}
 
 		
 statsmgr = StatsManager()
 
 
 class StatsHandler(object):
-	def filter(self, team, match_data):
+	def filter(self, match_data):
 		raise NotImplementedError()
 		
 
@@ -44,7 +44,7 @@ class GoalsScored(StatsHandler):
 					average_scores_per_game=average_scores_per_game,
 					average_shots_per_game=average_shots_per_game)
 		
-	def filter(self, team, match_data):
+	def filter(self, match_data):
 		shooting_data = [match['shooting'] for match in match_data]
 		
 		low_far_success = [match['low']['far']['success'] for match in shooting_data]
