@@ -7,7 +7,7 @@ html, body {
   overflow-y: auto;
 }
 .batter-background {
-    background: url("../img/field.svg");
+    /* background: url("../img/field.svg"); */
     background-position: right;
     background-size: contain;
     background-clip: content-box;
@@ -17,7 +17,7 @@ html, body {
 .defence-row {
   padding: 0.5em;
   max-height: 25vh;
-  background-color: #ffa500;
+  background-color: # 5{{ defence.type }};
 }
 
 .defence-row-info {
@@ -29,30 +29,43 @@ html, body {
   margin-left: 50%;
 }
 
-.crossing-variance {
-  margin-top: 50%;
-  margin-left: 50%;
-}
-
 .defence-row-kind {
-  height: 23vh;
+  height: auto;
 }
 
 .defence-picture {
   object-fit: scale-down;
-  margin-top: 5%;
+  margin: auto;
 }
 
-.defence-category {
-  font-weight: bold;
-  font-size: 15vh;
-}
 .thumbnail>img {
-  height: 16vh;
+  height: auto;
 }
 
-.defence-name {
-  text-align: center;
-  margin-top: 0.2em;
-  font-size: 3vh;
+.shooting-col-far {
+	background-color: #ccc;
+}
+
+.shooting-col-close {
+	background-color: #90C3D4;
+}
+
+.shooting-col-castle {
+	background-color: red;
+}
+
+.shooting-row-top {
+	height: 35%;	
+}
+
+.shooting-row-mid-top {
+	height: 15%
+}
+
+.shooting-row-mid-bottom {
+	height: 15%
+}
+
+.shooting-row-bottom {
+	height: 35%;	
 }
