@@ -1,3 +1,18 @@
+SIZE_LIST = ['large', 'medium', 'small']
+COLOR_LIST = ['green', 'orange', 'red']
+
+class Granulator(object):
+	def __init__(self, thershold_list, ret_list):
+		self._thresholds = thershold_list
+		self._rets = ret_list
+
+	def get(self, value):
+		for thresh, ret in zip(self._thresholds, self._rets):
+			if value >= thresh:
+				return ret
+		return ret[-1]
+			
+
 class StatsManager(object):
 	def __init__(self):
 		self._handlers = {}
@@ -20,6 +35,13 @@ class StatsHandler(object):
 
 @statsmgr.register_handler
 class GoalsScored(StatsHandler):
+	HIGH_AMOUNT_OF_SHOTS = 20
+	MED_AMOUNT_OF_SHOTS = 10
+	AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT_OF_SHOTS, MED_AMOUNT_OF_SHOTS], SIZE_LIST)
+	HIGH_PERCENTAGE = 0.75
+	MED_PERCENTAGE = 0.25
+	PERCENTAGE_GRANULATOR = Granulator([HIGH_PERCENTAGE, MED_PERCENTAGE], COLOR_LIST)
+
 	@staticmethod
 	def _run_stats(success, failure):
 		match_number = len(success)
@@ -33,16 +55,21 @@ class GoalsScored(StatsHandler):
 			            total_scored=total_scored,
 			            total_shots=total_shots)
 			
-		shooting_percentage = total_scored/total_shots
+		shooting_percentage = total_scored / total_shots
 		average_scores_per_game = total_scored / match_number
 		average_shots_per_game = total_shots / match_number
+
+		size = self.AMOUNT_GRANULATOR.get(total_shots)
+		color = self.PERCENTAGE_GRANULATOR.get(shooting_percentage)
 		
 		return dict(match_number=match_number,
 		            total_scored=total_scored,
 					total_shots=total_shots,
 					shooting_percentage=shooting_percentage,
 					average_scores_per_game=average_scores_per_game,
-					average_shots_per_game=average_shots_per_game)
+					average_shots_per_game=average_shots_per_game,
+					size=size,
+					color=color)
 		
 	def filter(self, match_data):
 		shooting_data = [match['shooting'] for match in match_data]
