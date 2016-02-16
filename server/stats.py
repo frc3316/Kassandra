@@ -90,3 +90,87 @@ class GoalsScored(StatsHandler):
 			                 close=GoalsScored._run_stats(low_close_success, low_close_failure)),
 		            high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
 		            	      close=GoalsScored._run_stats(high_close_success, high_close_failure)))
+		
+class DeffencesCrossed(StatsHandler):
+	HIGH_AMOUNT_OF_CROSSES = 20
+	MED_AMOUNT_OF_CROSSES = 10
+	AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT_OF_SHOTS, MED_AMOUNT_OF_SHOTS], SIZE_LIST)
+	HIGH_PERCENTAGE = 0.75
+	MED_PERCENTAGE = 0.25
+	PERCENTAGE_GRANULATOR = Granulator([HIGH_PERCENTAGE, MED_PERCENTAGE], COLOR_LIST)
+	#translated the GoalsScored by f(shooting)=attempts; f(scoring)=crosses
+	@staticmethod
+	def _run_stats(success, failure):
+		match_number = len(success)
+		if match_number == 0:
+			return dict(match_number=match_number)
+			
+		total_crossed = float(sum(success))
+		total_attempts = float(sum(failure) + sum(success))
+		if total_attempts == 0:
+			return dict(match_number=match_number,
+			            total_crossed=total_crossed,
+			            total_attempts=total_attempts)
+			
+		attempts_percentage = total_crossed / total_attempts
+		average_crosses_per_game = total_crossed / match_number
+		average_attempts_per_game = total_attempts / match_number
+
+		size = self.AMOUNT_GRANULATOR.get(total_attempts)
+		color = self.PERCENTAGE_GRANULATOR.get(attempts_percentage)
+		
+		return dict(match_number=match_number,
+		            total_crossed=total_crossed,
+					total_attempts=total_attempts,
+					attempts_percentage=attempts_percentage,
+					average_crosses_per_game=average_crosses_per_game,
+					average_attempts_per_game=average_attempts_per_game,
+					size=size,
+					color=color)	
+	""" todo: translate to crosses
+	def filter(self, match_data): 
+		shooting_data = [match['shooting'] for match in match_data]
+		
+		low_far_success = [match['low']['far']['success'] for match in shooting_data]
+		low_far_failure = [match['low']['far']['failure'] for match in shooting_data]
+		low_far_stats = self._run_stats(low_far_success, low_far_failure)
+		
+		high_far_success = [match['high']['far']['success'] for match in shooting_data]
+		high_far_failure = [match['high']['far']['failure'] for match in shooting_data]
+		high_far_stats = self._run_stats(high_far_success, high_far_failure)
+		
+		far_stats = self._run_stats(map(sum, zip(low_far_success, high_far_success)),
+									map(sum, zip(low_far_failure, high_far_failure)))
+		
+		low_close_success = [match['low']['close']['success'] for match in shooting_data]
+		low_close_failure = [match['low']['close']['failure'] for match in shooting_data]
+		low_close_stats = self._run_stats(low_close_success, low_close_failure)
+		
+		high_close_success = [match['high']['close']['success'] for match in shooting_data]
+		high_close_failure = [match['high']['close']['failure'] for match in shooting_data]
+		high_close_stats = self._run_stats(high_close_success, high_close_failure)
+		
+		close_stats = self._run_stats(map(sum, zip(low_close_success, high_close_success)),
+									  map(sum, zip(low_close_failure, high_close_failure)))
+		
+		low_stats = self._run_stats(map(sum, zip(low_close_success, low_far_success)),
+									map(sum, zip(low_close_failure, low_far_failure)))
+		high_stats = self._run_stats(map(sum, zip(high_close_success, high_far_success)),
+									 map(sum, zip(high_close_failure, high_far_failure)))
+		
+		total_stats = self._run_stats(map(sum, zip(low_close_success, low_far_success, high_close_success, high_far_success)),
+									 map(sum, zip(low_close_failure, low_far_failure, high_close_failure, high_far_failure)))
+		
+		return dict(low_far_stats=low_far_stats,
+		            high_far_stats=high_far_stats,
+					low_close_stats=low_close_stats,
+					high_close_stats=high_close_stats,
+					far_stats=far_stats,
+					close_stats=close_stats,
+					low_stats=low_stats,
+					high_stats=high_stats,
+					total_stats=total_stats)
+	"""
+	
+	#todo: finish DeffencesCrossed.filter()
+	#todo: write multiDeffences Handler
