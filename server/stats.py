@@ -157,10 +157,7 @@ class DeffencesCrossed(StatsHandler):
 		d_2_success = [match['d']['2']['success'] for match in breaching_data]
 		d_2_failure = [match['d']['2']['failure'] for match in breaching_data]
 		
-		return dict(low=dict(far=GoalsScored._run_stats(low_far_success, low_far_failure),
-			                 close=GoalsScored._run_stats(low_close_success, low_close_failure)),
-		            high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
-		            	      close=GoalsScored._run_stats(high_close_success, high_close_failure)))
+		return dict(a=dict(_1solo=DeffencesCrossed._run_stats(a_1solo_success, a_1solo_failure),_1assist=DeffencesCrossed._run_stats(a_1assist_success, a_1assist_failure),_2=DeffencesCrossed._run_stats(a_2_success, a_2_failure)), b=dict(_1=DeffencesCrossed._run_stats(b_1_success, b_1_failure),_2=DeffencesCrossed._run_stats(b_2_success, b_2_failure)),c=dict(_1solo=DeffencesCrossed._run_stats(c_1solo_success, c_1solo_failure),_1assist=DeffencesCrossed._run_stats(c_1assist_success, c_1assist_failure),_2solo=DeffencesCrossed._run_stats(c_2solo_success, c_2solo_failure),_2assist=DeffencesCrossed._run_stats(c_2assist_success, c_2assist_failure)),d=dict(_1=DeffencesCrossed._run_stats(d_1_success, d_1_failure),_2=DeffencesCrossed._run_stats(d_2_success, d_2_failure)))
 	""" todo: translate to crosses
 	"""
 	
