@@ -132,16 +132,28 @@ class DeffencesCrossed(StatsHandler):
 		return stats
 		
 	def filter(self, match_data):
-		shooting_data = [match['shooting'] for match in match_data]
+		breaching_data = [match['breaching'] for match in match_data]
 		
-		low_far_success = [match['low']['far']['success'] for match in shooting_data]
-		low_far_failure = [match['low']['far']['failure'] for match in shooting_data]
-		high_far_success = [match['high']['far']['success'] for match in shooting_data]
-		high_far_failure = [match['high']['far']['failure'] for match in shooting_data]
-		low_close_success = [match['low']['close']['success'] for match in shooting_data]
-		low_close_failure = [match['low']['close']['failure'] for match in shooting_data]
-		high_close_success = [match['high']['close']['success'] for match in shooting_data]
-		high_close_failure = [match['high']['close']['failure'] for match in shooting_data]
+		a_1solo_success = [match['a']['1solo']['success'] for match in breaching_data]
+		a_1solo_failure = [match['a']['1solo']['failure'] for match in breaching_data]
+		a_1assist_success = [match['a']['1assist']['success'] for match in breaching_data]
+		a_1assist_failure = [match['a']['1assist']['failure'] for match in breaching_data]
+		a_2_success = [match['a']['2']['success'] for match in breaching_data]
+		a_2_failure = [match['a']['2']['failure'] for match in breaching_data]
+		b_1_success = [match['b']['1']['success'] for match in breaching_data]
+		b_1_failure = [match['b']['1']['failure'] for match in breaching_data]
+		b_2_success = [match['b']['2']['success'] for match in breaching_data]
+		b_2_failure = [match['b']['2']['failure'] for match in breaching_data]
+		c_1solo_success = [match['c']['1solo']['success'] for match in breaching_data]
+		c_1solo_failure = [match['c']['1solo']['failure'] for match in breaching_data]
+		c_1assist_success = [match['c']['1assist']['success'] for match in breaching_data]
+		c_1assist_failure = [match['c']['1assist']['failure'] for match in breaching_data]
+		c_2_success = [match['c']['2']['success'] for match in breaching_data]
+		c_2_failure = [match['c']['2']['failure'] for match in breaching_data]
+		d_1_success = [match['d']['1']['success'] for match in breaching_data]
+		d_1_failure = [match['d']['1']['failure'] for match in breaching_data]
+		d_2_success = [match['d']['2']['success'] for match in breaching_data]
+		d_2_failure = [match['d']['2']['failure'] for match in breaching_data]
 		
 		return dict(low=dict(far=GoalsScored._run_stats(low_far_success, low_far_failure),
 			                 close=GoalsScored._run_stats(low_close_success, low_close_failure)),
