@@ -18,7 +18,7 @@ class StatsManager(object):
 		self._handlers = {}
 		
 	def register_handler(self, handler):
-		self._handlers[handler.__name__] = handler()
+		self._handlers[handler.KEY] = handler()
 		return handler
 	
 	def run_handlers(self, match_data):
@@ -35,6 +35,7 @@ class StatsHandler(object):
 
 @statsmgr.register_handler
 class GoalsScored(StatsHandler):
+	KEY = "shooting"
 	HIGH_AMOUNT_OF_SHOTS = 20
 	MED_AMOUNT_OF_SHOTS = 10
 	AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT_OF_SHOTS, MED_AMOUNT_OF_SHOTS], SIZE_LIST)
