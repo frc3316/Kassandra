@@ -5,9 +5,11 @@ html, body {
 .halves {
   height: 100%;
   overflow-y: auto;
+	padding: 0px;
 }
+ /* Unused */
 .batter-background {
-    /* background: url("../img/field.svg"); */
+    background: url("../img/field.svg");
     background-position: right;
     background-size: contain;
     background-clip: content-box;
@@ -17,7 +19,8 @@ html, body {
 .defence-row {
   padding: 0.5em;
   max-height: 25vh;
-  background-color: # 5{{ defence.type }};
+  background-color: #222222;
+  border: medium dashed green;
 }
 
 .defence-row-info {
@@ -25,47 +28,60 @@ html, body {
 }
 
 .crossing-counter {
-  margin-top: 8vh;
+	font-size: 4rem;
+	font-family: monospace;
+  align-items: center;
   margin-left: 50%;
-}
-
-.defence-row-kind {
-  height: auto;
+	height: 100%;
 }
 
 .defence-picture {
-  object-fit: scale-down;
+  height: 100%;
+	width: auto !important;
+  object-fit: cover;
   margin: auto;
 }
 
-.thumbnail>img {
-  height: auto;
+.defence-thumbnail {
+	margin-bottom: 0px !important;
+  overflow: hidden;
+	max-height: 20vh;
 }
 
 .shooting-col-far {
+	height: 100%;
 	background-color: #ccc;
+	margin: 0px;
 }
 
 .shooting-col-close {
+	height: 100%;
 	background-color: #90C3D4;
+	margin: 0px;
 }
 
 .shooting-col-castle {
-	background-color: red;
+	height: 100%;
+	background: url("../img/hexagon.svg");
+	background-position: right;
+	background-origin: border-box;
+	/* background-size: 20em, auto; */
+	background-repeat: no-repeat;
+	margin: 0px;
 }
 
 .shooting-row-top {
-	height: 35%;	
+	height: 32%;	
 }
 
 .shooting-row-mid-top {
-	height: 15%
+	height: 12%
 }
 
 .shooting-row-mid-bottom {
-	height: 15%
+	height: 12%
 }
 
 .shooting-row-bottom {
-	height: 35%;	
+	height: 32%;	
 }

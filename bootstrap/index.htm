@@ -29,57 +29,59 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
 
-    <div class="row" style="height: 100%;">
+    <div class="row" style="height: 100%; margin: 0px;">
 
       <div class="col-xs-6 halves">
         <h3>Breaching</h3>
         <div ng-repeat="defence in defences" class="row defence-row">
           <div class="defence-row-info col-xs-8">
-            <h3 class="crossing-counter bg-{{ defence.color }}">{{ defence.successfuls }}/ {{ defence.attempted }}</h3>
+            <p class="crossing-counter bg-{{ defence.color }}">{{ defence.successfuls }}/{{ defence.attempted }}</p>
           </div>
 
-          <div class="defence-row-kind thumbnail col-xs-4">
+          <div class="thumbnail defence-thumbnail col-xs-4">
             <img class="defence-picture" src="img/defences/{{ defence.type }}.png" alt="{{ defence.name }}">
           </div>
         </div>
       </div>
 
-      <div class="col-xs-6 halves batter-background">
+      <div class="col-xs-6 halves">
         <h3>Shooting</h3>
 		<div class="col-xs-5 shooting-col-far">
 			<!-- Far out man! -->
-			<div class="shorting-row-top">
+			<div class="shooting-row-top">
 				<p>test</p>
 			</div>
 			<div class="shooting-row-mid-top">
+				<p>test</p>
 			</div>
 			<div class="shooting-row-mid-bottom">
+				<p>test</p>
 			</div>
-			<div class="shorting-row-bottom">
+			<div class="shooting-row-bottom">
+				<p>test</p>
 			</div>
 		</div>
 		<div class="col-xs-5 shooting-col-close">
 			<!-- So close-->
-			<div class="shorting-row-top">
-				<p>test</p>
+			<div class="shooting-row-top">
 			</div>
 			<div class="shooting-row-mid-top">
 			</div>
 			<div class="shooting-row-mid-bottom">
 			</div>
-			<div class="shorting-row-bottom">
+			<div class="shooting-row-bottom">
 			</div>
 		</div>
 		<div class="col-xs-2 shooting-col-castle">
 			<!-- Castle -->
-			<div class="shorting-row-top">
+			<div class="shooting-row-top">
 				<p>test</p>
 			</div>
 			<div class="shooting-row-mid-top">
 			</div>
 			<div class="shooting-row-mid-bottom">
 			</div>
-			<div class="shorting-row-bottom">
+			<div class="shooting-row-bottom">
 			</div>
 		</div>
 		
