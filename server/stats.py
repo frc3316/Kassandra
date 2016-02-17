@@ -90,7 +90,7 @@ class GoalsScored(StatsHandler):
 			                 close=GoalsScored._run_stats(low_close_success, low_close_failure)),
 		            high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
 		            	      close=GoalsScored._run_stats(high_close_success, high_close_failure)))
-		
+@statsmgr.register_handler		
 class DeffencesCrossed(StatsHandler):
 	KEY = "breaching"
 	HIGH_AMOUNT_OF_BREACHES = 6
@@ -133,33 +133,10 @@ class DeffencesCrossed(StatsHandler):
 		
 	def filter(self, match_data):
 		breaching_data = [match['breaching'] for match in match_data]
-		
-		a_1solo_success = [match['a']['1solo']['success'] for match in breaching_data]
-		a_1solo_failure = [match['a']['1solo']['failure'] for match in breaching_data]
-		a_1assist_success = [match['a']['1assist']['success'] for match in breaching_data]
-		a_1assist_failure = [match['a']['1assist']['failure'] for match in breaching_data]
-		a_2_success = [match['a']['2']['success'] for match in breaching_data]
-		a_2_failure = [match['a']['2']['failure'] for match in breaching_data]
-		b_1_success = [match['b']['1']['success'] for match in breaching_data]
-		b_1_failure = [match['b']['1']['failure'] for match in breaching_data]
-		b_2_success = [match['b']['2']['success'] for match in breaching_data]
-		b_2_failure = [match['b']['2']['failure'] for match in breaching_data]
-		c_1solo_success = [match['c']['1solo']['success'] for match in breaching_data]
-		c_1solo_failure = [match['c']['1solo']['failure'] for match in breaching_data]
-		c_1assist_success = [match['c']['1assist']['success'] for match in breaching_data]
-		c_1assist_failure = [match['c']['1assist']['failure'] for match in breaching_data]
-		c_2solo_success = [match['c']['2solo']['success'] for match in breaching_data]
-		c_2solo_failure = [match['c']['2solo']['failure'] for match in breaching_data]
-		c_2assist_success = [match['c']['2assist']['success'] for match in breaching_data]
-		c_2assist_failure = [match['c']['2assist']['failure'] for match in breaching_data]
-		d_1_success = [match['d']['1']['success'] for match in breaching_data]
-		d_1_failure = [match['d']['1']['failure'] for match in breaching_data]
-		d_2_success = [match['d']['2']['success'] for match in breaching_data]
-		d_2_failure = [match['d']['2']['failure'] for match in breaching_data]
-		
-		return dict(a=dict(_1solo=DeffencesCrossed._run_stats(a_1solo_success, a_1solo_failure),_1assist=DeffencesCrossed._run_stats(a_1assist_success, a_1assist_failure),_2=DeffencesCrossed._run_stats(a_2_success, a_2_failure)), b=dict(_1=DeffencesCrossed._run_stats(b_1_success, b_1_failure),_2=DeffencesCrossed._run_stats(b_2_success, b_2_failure)),c=dict(_1solo=DeffencesCrossed._run_stats(c_1solo_success, c_1solo_failure),_1assist=DeffencesCrossed._run_stats(c_1assist_success, c_1assist_failure),_2solo=DeffencesCrossed._run_stats(c_2solo_success, c_2solo_failure),_2assist=DeffencesCrossed._run_stats(c_2assist_success, c_2assist_failure)),d=dict(_1=DeffencesCrossed._run_stats(d_1_success, d_1_failure),_2=DeffencesCrossed._run_stats(d_2_success, d_2_failure)))
-	""" todo: translate to crosses
-	"""
+		DEFFENCES = ['a1','a2','b1','b2','c1','c2','c1_assist', 'c2_assist', 'd1', 'd2']
+		breaching_success={deffence:[match[deffence]['success'] for match in breaching_data] for deffence in DEFFENCES}
+		breaching_failure={deffence:[match[deffence]['failure'] for match in breaching_data] for deffence in DEFFENCES}
+		return dict(a1=DeffencesCrossed._run_stats(a_1_success, a_1_failure),_2=DeffencesCrossed._run_stats(a_2_success, a_2_failure)), b=dict(_1=DeffencesCrossed._run_stats(b_1_success, b_1_failure),_2=DeffencesCrossed._run_stats(b_2_success, b_2_failure)),c=dict(_1solo=DeffencesCrossed._run_stats(c_1solo_success, c_1solo_failure),_1assist=DeffencesCrossed._run_stats(c_1assist_success, c_1assist_failure),_2solo=DeffencesCrossed._run_stats(c_2solo_success, c_2solo_failure),_2assist=DeffencesCrossed._run_stats(c_2assist_success, c_2assist_failure)),d=dict(_1=DeffencesCrossed._run_stats(d_1_success, d_1_failure),_2=DeffencesCrossed._run_stats(d_2_success, d_2_failure)))
+	# todo: last line has to be rewritten according to the new structure.
 	
-	#todo: finish DeffencesCrossed.filter()
-	#todo: write multiDeffences Handler
+
