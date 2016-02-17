@@ -136,7 +136,6 @@ class DeffencesCrossed(StatsHandler):
 		DEFFENCES = ['a1','a2','b1','b2','c1','c2','c1_assist', 'c2_assist', 'd1', 'd2']
 		breaching_success={deffence:[match[deffence]['success'] for match in breaching_data] for deffence in DEFFENCES}
 		breaching_failure={deffence:[match[deffence]['failure'] for match in breaching_data] for deffence in DEFFENCES}
-		return dict(a1=DeffencesCrossed._run_stats(a_1_success, a_1_failure),_2=DeffencesCrossed._run_stats(a_2_success, a_2_failure)), b=dict(_1=DeffencesCrossed._run_stats(b_1_success, b_1_failure),_2=DeffencesCrossed._run_stats(b_2_success, b_2_failure)),c=dict(_1solo=DeffencesCrossed._run_stats(c_1solo_success, c_1solo_failure),_1assist=DeffencesCrossed._run_stats(c_1assist_success, c_1assist_failure),_2solo=DeffencesCrossed._run_stats(c_2solo_success, c_2solo_failure),_2assist=DeffencesCrossed._run_stats(c_2assist_success, c_2assist_failure)),d=dict(_1=DeffencesCrossed._run_stats(d_1_success, d_1_failure),_2=DeffencesCrossed._run_stats(d_2_success, d_2_failure)))
-	# todo: last line has to be rewritten according to the new structure.
+		return {deffence:DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}	# todo: last line has to be rewritten according to the new structure.
 	
 
