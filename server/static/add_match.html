@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+			<title>Kassandra - Match Entry</title>
+			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+				<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+					<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+					<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+				</head>
+				<body ng-app="formExample">
+					<div class="container-fluid" ng-controller="KassandraController">
+						<h1>Kassandra - Match Entry</h1>
+						<form novalidate role="form" name="form" class="simple-form" ng-submit="processForm()">
+							<div class="row">
+								<div class="col-xs-6 form-group">
+									<label class="control-label" for="match">Match:</label>
+									<input class="form-control" type="text" ng-model="match" size="4" name="match" />
+								</div>
+								
+								<div class="col-xs-6 form-group">
+									<label class="control-label" for="red1">Red 1:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="red1" name="red1" />
+									<label class="control-label" for="red2">Red 2:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="red2" name="red2" />
+									<label class="control-label" for="red3">Red 3:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="red3" name="red3" />
+									<label class="control-label" for="blue1">Blue 1:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="blue1" name="blue1" />
+									<label class="control-label" for="blue2">Blue 2:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="blue2" name="blue2" />
+									<label class="control-label" for="blue3">Blue 3:</label>
+									<input type="number" min="1" max="7000" class="form-control" ng-model="blue3" name="blue3" />
+								</div>
+							<input type="submit" />
+						</form>
+					</div>
+					
+					<script>
+			angular.module('formExample', [])
+			.controller('KassandraController', function ($scope, $http) {
+						// Process the form
+						$scope.processForm = function () {
+							var formData = {
+								'match': $scope.match,
+								'red1': $scope.red1,
+								'red2': $scope.red2,
+								'red3': $scope.red3,
+								'blue1': $scope.blue1,
+								'blue2': $scope.blue2,
+								'blue3': $scope.blue3
+							};
+							$http.post('/add/match', formData, {headers: {'Content-Type': 'application/json'}})
+							.success(function (data) {
+								console.log(data);
+							});
+						};
+					}
+				);
+					</script>
+				</body>
+			</html>

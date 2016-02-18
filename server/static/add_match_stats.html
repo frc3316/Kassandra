@@ -2,13 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-			<title>Kassandra - Match Entry</title>
+			<title>Kassandra - Match Stats Entry</title>
 			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 				<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 					<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-					<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+					<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 				</head>
 				<body ng-app="formExample">
 					<div class="container-fluid" ng-controller="KassandraController">
@@ -273,7 +273,7 @@
 								'end_game': $scope.end_game,
 								'defences': $scope.defences
 							};
-							$http.post('/addmatch', formData, {headers: {'Content-Type': 'application/json'}})
+							$http.post('/add/stats', formData, {headers: {'Content-Type': 'application/json'}})
 							.success(function (data) {
 								console.log(data);
 							});
