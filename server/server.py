@@ -4,6 +4,8 @@ import glob
 import json
 import os
 
+os.chdir('server')
+
 from stats import statsmgr
 
 app = Flask(__name__)
