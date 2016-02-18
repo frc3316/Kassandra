@@ -1,1 +1,1 @@
-web: sh -c "cd server; exec gunicorn -b 0.0.0.0:$PORT server:app"
+web: sh -c "cd server; exec gunicorn -b 0.0.0.0:$PORT --log-file=- server:app"
