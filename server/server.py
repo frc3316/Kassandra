@@ -1,4 +1,5 @@
 from flask import Flask, Response, request, jsonify
+from flask.ext.sqlalchemy import SQLAlchemy
 import glob
 import json
 import os
@@ -6,6 +7,8 @@ import os
 from stats import statsmgr
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+db = SQLAlchemy(app)
 
 DATABASE_DIR = "database"
 
