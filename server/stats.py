@@ -1,6 +1,7 @@
 SIZE_LIST = ['3', '2', '1']
 COLOR_LIST = ['success', 'warning', 'danger']
 
+
 class Granulator(object):
 	def __init__(self, thershold_list, ret_list):
 		self._thresholds = thershold_list
@@ -136,6 +137,4 @@ class DeffencesCrossed(StatsHandler):
 		DEFFENCES = ['a1','a2','b1','b2','c1','c2','c1_assist', 'c2_assist', 'd1', 'd2']
 		breaching_success={deffence:[match[deffence]['success'] for match in breaching_data] for deffence in DEFFENCES}
 		breaching_failure={deffence:[match[deffence]['failure'] for match in breaching_data] for deffence in DEFFENCES}
-		return {deffence:DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}	# todo: last line has to be rewritten according to the new structure.
-	
-
+		return {deffence : DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}	
