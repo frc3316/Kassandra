@@ -77,22 +77,22 @@ class GoalsScored(StatsHandler):
         return stats
 
 
-def filter(self, match_data):
-    shooting_data = [match['shooting'] for match in match_data]
+    def filter(self, match_data):
+        shooting_data = [match['shooting'] for match in match_data]
 
-    low_far_success = [match['low']['far']['success'] for match in shooting_data]
-    low_far_failure = [match['low']['far']['failure'] for match in shooting_data]
-    high_far_success = [match['high']['far']['success'] for match in shooting_data]
-    high_far_failure = [match['high']['far']['failure'] for match in shooting_data]
-    low_close_success = [match['low']['close']['success'] for match in shooting_data]
-    low_close_failure = [match['low']['close']['failure'] for match in shooting_data]
-    high_close_success = [match['high']['close']['success'] for match in shooting_data]
-    high_close_failure = [match['high']['close']['failure'] for match in shooting_data]
+        low_far_success = [match['low']['far']['success'] for match in shooting_data]
+        low_far_failure = [match['low']['far']['failure'] for match in shooting_data]
+        high_far_success = [match['high']['far']['success'] for match in shooting_data]
+        high_far_failure = [match['high']['far']['failure'] for match in shooting_data]
+        low_close_success = [match['low']['close']['success'] for match in shooting_data]
+        low_close_failure = [match['low']['close']['failure'] for match in shooting_data]
+        high_close_success = [match['high']['close']['success'] for match in shooting_data]
+        high_close_failure = [match['high']['close']['failure'] for match in shooting_data]
 
-    return dict(low=dict(far=GoalsScored._run_stats(low_far_success, low_far_failure),
-                         close=GoalsScored._run_stats(low_close_success, low_close_failure)),
-                high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
-                          close=GoalsScored._run_stats(high_close_success, high_close_failure)))
+        return dict(low=dict(far=GoalsScored._run_stats(low_far_success, low_far_failure),
+                             close=GoalsScored._run_stats(low_close_success, low_close_failure)),
+                    high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
+                              close=GoalsScored._run_stats(high_close_success, high_close_failure)))
 
 
 @statsmgr.register_handler
