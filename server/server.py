@@ -159,7 +159,7 @@ def _db_add_match_stats(match_stats_data):
     defences = match_stats_data.pop('defences')
     
     match_stats_object = MatchStats(match=match, team=team, breaching_dict=breaching, shooting_dict=shooting,
-                                    collection_dict=collection, end_game_dict=end_game, defences_list=defeces)
+                                    collection_dict=collection, end_game_dict=end_game, defences_list=defences)
     db.session.add(match_stats_object)
     db.session.commit()
     return match_stats_object
