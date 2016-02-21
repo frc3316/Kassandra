@@ -113,8 +113,8 @@ class MatchStats(db.Model):
         self.match = match
         self.team = team
         
-        for key, value in breaching_dict.items():
-            for result, value in distance_data.items():
+        for key, breach_data in breaching_dict.items():
+            for result, value in breach_data.items():
                 setattr(self, '%s_%s' % (key, result), int(value))
 
         for goal, goal_data in shooting_dict.items():
@@ -130,7 +130,7 @@ class MatchStats(db.Model):
 
         defences = []
         for defence in defences_list:
-            match_defence = MatchDefence(defender=team, match=match, attacker=defence['team'], tactic=defence['tactic'])
+            match_defence = MatchDefence(defender=team, match=match, attacker=int(defence['team']), tactic=defence['tactic'])
             db.session.add(match_defence)
             db.session.commit()
             defences.append(match_defence.id)
@@ -151,7 +151,7 @@ def _db_add_match(match_data):
 def _db_add_match_stats(match_stats_data):
     """ Store match data into DB """
     match = match_stats_data.pop('match')
-    team = match_stats_data.pop('team')
+    team = int(match_stats_data.pop('team'))
     breaching = match_stats_data.pop('breaching')
     shooting = match_stats_data.pop('shooting')
     collection = match_stats_data.pop('collection')
