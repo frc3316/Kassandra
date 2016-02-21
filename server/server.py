@@ -287,7 +287,7 @@ def get_team_stats_list():
         match_list = _db_get_matchs()
         stats_by_team = defaultdict(int)
         stats_by_match = defaultdict(lambda: {'red': 0, 'blue': 0})
-        for match_stats in collection_dict:
+        for match_stats in collected_stats:
             team = match_stats.team
             match = match_stats.match
             alliance = 'red' if team in match_list[match]['red'] else 'blue'
