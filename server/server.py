@@ -288,8 +288,17 @@ def get_team_stats_list():
     except Exception, ex:
         return jsonify(status='ERROR', msg=ex.message)
 
-    stats_by_team = defaultdict(int)
-    stats_by_match = defaultdict(lambda: {'red': 0, 'blue': 0})
+    # Populate base dicts
+    stats_by_team = {}
+    stats_by_match = {}
+    for match, alliances in match_list.items():
+        stats_by_match[match] = {}
+        for alliance, teams in alliances.items():
+            stats_by_match[match][alliance] = 0
+            for team in teams:
+                stats_by_team[team] = 0
+
+    # Populate dicts with actual data
     for match_stats in collected_stats:
         team = match_stats.team
         match = match_stats.match
@@ -332,19 +341,24 @@ def get_alliance_stats(match, alliance):
 
     if match_alliances is None:
         return jsonify(status='ERROR', match=match, alliance=alliance,
-                       msg=("Match %r does not exist." % match))
+                       msg=("Match %s does not exist." % match))
     
     alliance_teams = match_alliances.get(alliance)
     if alliance_teams is None:
         return jsonify(status='ERROR', match=match, alliance=alliance,
-                       msg=("Alliance %r does not exist." % alliance))
+                       msg=("Alliance %s does not exist." % alliance))
         
     matches = []
     for team_number in alliance_teams:
         try:
-            matches.extend(_db_get_match_stats(team=team_number))
+            team_stats = _db_get_match_stats(team=team_number)
+            if team_stats:
+                matches.extend(team_stats)
         except Exception, ex:
             return jsonify(status='ERROR', msg=ex.message)
+
+    return jsonify(status='ERROR', match=match, alliance=alliance,
+                   msg=("No stats recorded for teams: %d, %d or %d." % tuple(alliance_teams)))
 
     try:
         stats = statsmgr.run_handlers(matches)

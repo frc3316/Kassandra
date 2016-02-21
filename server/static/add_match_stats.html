@@ -141,6 +141,14 @@
 								</div>
 							</div>
 							<input type="submit" />
+							<div class="alert alert-danger" ng-show="submit_error_msg">
+								<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+								{{submit_error_msg}}
+							</div>
+							<div class="alert alert-success" ng-show="submit_ok_msg">
+								<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+								{{submit_ok_msg}}
+							</div>
 						</form>
 					</div>
 					
@@ -153,89 +161,95 @@
 							$scope.matches = response.data;
 						});
 						$scope.tactics = ['Pinning', 'T-Boning', 'Harrasing', 'Shot Blocking'];
-						
-						/* Form match data */ 
-						$scope.match = '';
-						$scope.team = '';
-						$scope.alliance = '';
-						$scope.opposition = '';
-						$scope.breaching = {
-							'a1' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'a2' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'b1' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'b2' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'c1' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'c2' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'c1_assist' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'c2_assist' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'd1' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'd2' : {
-								'success' : 0,
-								'failure' : 0
-							},
-							'lb' : {
-								'success' : 0,
-								'failure' : 0
-							}
-						};
-						$scope.shooting = {
-							'low' : {
-								'far' : {
+						$scope.submit_error_msg = null;
+						$scope.submit_ok_msg = null;
+
+						$scope.clearForm = function() {
+							/* Form match data */ 
+							$scope.match = '';
+							$scope.team = '';
+							$scope.alliance = '';
+							$scope.opposition = '';
+							$scope.breaching = {
+								'a1' : {
 									'success' : 0,
 									'failure' : 0
 								},
-								'close' : {
-									'success' : 0,
-									'failure' : 0
-								}
-							},
-							'high' : {
-								'far' : {
+								'a2' : {
 									'success' : 0,
 									'failure' : 0
 								},
-								'close' : {
+								'b1' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'b2' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'c1' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'c2' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'c1_assist' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'c2_assist' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'd1' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'd2' : {
+									'success' : 0,
+									'failure' : 0
+								},
+								'lb' : {
 									'success' : 0,
 									'failure' : 0
 								}
-							}
-						};
-						$scope.collection = {
-							'floor': 0,
-							'hp': 0
-						};
-						$scope.end_game = {
-							'challenge': false,
-							'scale': false,
-						};
-						$scope.defences = [];
+							};
+							$scope.shooting = {
+								'low' : {
+									'far' : {
+										'success' : 0,
+										'failure' : 0
+									},
+									'close' : {
+										'success' : 0,
+										'failure' : 0
+									}
+								},
+								'high' : {
+									'far' : {
+										'success' : 0,
+										'failure' : 0
+									},
+									'close' : {
+										'success' : 0,
+										'failure' : 0
+									}
+								}
+							};
+							$scope.collection = {
+								'floor': 0,
+								'hp': 0
+							};
+							$scope.end_game = {
+								'challenge': false,
+								'scale': false,
+							};
+							$scope.defences = [];
+						}
+
+						$scope.clearForm();
 						
 						/* Methods */ 
 						// Add new defensive tactic to `defences`
@@ -275,7 +289,12 @@
 							};
 							$http.post('/add/stats', formData, {headers: {'Content-Type': 'application/json'}})
 							.success(function (data) {
-								console.log(data);
+								if (data.status == 'OK') {
+									$scope.submit_ok_msg = 'Success! Submitted stats for match ' + data.match + ' on team ' + data.team;
+									$scope.clearForm();
+								} else {
+									$scope.submit_error_msg = "Error! " + data.msg;
+								}
 							});
 						};
 					}
