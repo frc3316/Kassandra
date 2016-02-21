@@ -36,7 +36,7 @@ class Match(db.Model):
     def __init__(self, match, teams_dict):
         self.match=match
         for key, value in teams_dict.items():
-            setattr(self, value, int(key))
+            setattr(self, key, int(value))
 
     def __repr__(self):
         return '<Match %r>' % self.match
@@ -150,13 +150,13 @@ def _db_add_match(match_data):
 
 def _db_add_match_stats(match_stats_data):
     """ Store match data into DB """
-    match = match_data.pop('match')
-    team = match_data.pop('team')
-    breaching = match_data.pop('breaching')
-    shooting = match_data.pop('shooting')
-    collection = match_data.pop('collection')
-    end_game = match_data.pop('end_game')
-    defences = match_data.pop('defences')
+    match = match_stats_data.pop('match')
+    team = match_stats_data.pop('team')
+    breaching = match_stats_data.pop('breaching')
+    shooting = match_stats_data.pop('shooting')
+    collection = match_stats_data.pop('collection')
+    end_game = match_stats_data.pop('end_game')
+    defences = match_stats_data.pop('defences')
     
     match_stats_object = MatchStats(match=match, team=team, breaching_dict=breaching, shooting_dict=shooting,
                                     collection_dict=collection, end_game_dict=end_game, defences_list=defeces)
