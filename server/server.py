@@ -21,10 +21,6 @@ db = SQLAlchemy(app)
 DATABASE_DIR = "database"
 
 ## Postgress Database Stuff
-def init_db():
-    """ initialize database """
-    pass
-
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match = db.Column(db.String(6), unique=True)
@@ -355,8 +351,6 @@ def get_alliance_stats(match, alliance):
     return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
     
 if __name__ == '__main__':
-    app.debug = True
-    init_db()
     app.run()
 
     # For favicon
