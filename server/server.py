@@ -100,7 +100,7 @@ def get_match(match):
 	""" returns the matches list """
 	try:
 		match = _db_get_match(match)
-		if not matche:
+		if not match:
 			return jsonify(status='ERROR', match=match,
 				           msg=("Didn't find match %s." % match))
 
