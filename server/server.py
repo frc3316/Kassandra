@@ -156,13 +156,13 @@ class MatchStats(db.Model):
             for result in ('success', 'failure'):
                 breaching_dict[key][result] = getattr(self, '%s_%s' % (key, result))
 
-        scoring_dict = {}
+        shooting_dict = {}
         for goal in ('low', 'high'):
-            scoring_dict[goal] = {}
+            shooting_dict[goal] = {}
             for distance in ('far', 'close'):
-                scoring_dict[goal][distance] = {}
+                shooting_dict[goal][distance] = {}
                 for result in ('success', 'failure'):
-                    scoring_dict[goal][distance][result] = getattr(self, '%s_%s_%s' % (goal, distance, result))
+                    shooting_dict[goal][distance][result] = getattr(self, '%s_%s_%s' % (goal, distance, result))
 
         collection_dict = {}
         for key in ('floor', 'hp'):
