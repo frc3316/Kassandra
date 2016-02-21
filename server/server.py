@@ -302,11 +302,18 @@ def get_team_stats_list():
     for match_stats in collected_stats:
         team = match_stats.team
         match = match_stats.match
-        alliance = 'red' if team in match_list[match]['red'] else 'blue'
+        if match not in match_list:
+            continue   # Illegal match stats entry...
+
+        if team in match_list[match]['red']:
+            stats_by_match[match]['red'] += 1
+        elif team in match_list[match]['blue']:
+            stats_by_match[match]['blue'] += 1
+        else:
+            continue  # Illegal match stats entry...
 
         stats_by_team[team] += 1
-        stats_by_match[match][alliance] += 1
-
+        
     teams = sorted(stats_by_team.items())
     matches = sorted(stats_by_match.items())
 
