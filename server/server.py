@@ -235,6 +235,9 @@ def _db_get_match(match):
         return m.to_dict().get(match)
 
 ## Flask Server Routes
+app.add_url_rule('/favicon.ico',
+                 redirect_to=url_for('static', filename='favicon.ico'))
+
 @app.route('/add/match', methods=['GET', 'POST'])
 def add_match():
     try:
