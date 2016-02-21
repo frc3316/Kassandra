@@ -32,34 +32,143 @@ class Match(db.Model):
     blue3 = db.Column(db.Integer)
 
 
-    def __init__(self, match, red1, red2, red3, blue1, blue2, blue3):
+    def __init__(self, match, teams_dict):
         self.match=match
-        self.red1=red1
-        self.red2=red2
-        self.red3=red3
-        self.blue1=blue1
-        self.blue2=blue2
-        self.blue3=blue3
+        for key, value in teams_dict.items():
+        	setattr(self, value, int(key))
 
     def __repr__(self):
         return '<Match %r>' % self.match
 
-def _db_add_match(match, r1, r2, r3, b1, b2, b3):
-	match = Match(match, r1, r2, r3, b1, b2, b3)
-	db.session.add(match)
-	db.session.commit()
-	return match
+class MatchDefence(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	defender = db.Column(db.Integer)
+	attacker = db.Column(db.Integer)
+	match = db.Column(db.String(6))
+	tactic = db.Column(db.String(64))
+	
+	def __init__(self, defender, attacker, match, tactic):
+		self.defender = defender
+		self.attacker = attacker
+		self.match = match
+		self.tactic = tactic
 
-def store_match(match, team, match_data):
+	def __repr__(self):
+		return "<MatchDefence [%d on %d] [Match: %s]>" % (self.defender, self.attacker, self.match)
+
+
+class MatchStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    match = db.Column(db.String(6))
+    team = db.Column(db.Integer)
+
+    # Breaching
+    a1_success = db.Column(db.Integer)
+    a1_failure = db.Column(db.Integer)
+    a2_success = db.Column(db.Integer)
+    a2_failure = db.Column(db.Integer)
+    b1_success = db.Column(db.Integer)
+    b1_failure = db.Column(db.Integer)
+    b2_success = db.Column(db.Integer)
+    b2_failure = db.Column(db.Integer)
+    c1_success = db.Column(db.Integer)
+    c1_failure = db.Column(db.Integer)
+    c2_success = db.Column(db.Integer)
+    c2_failure = db.Column(db.Integer)
+    c1_assist_success = db.Column(db.Integer)
+    c1_assist_failure = db.Column(db.Integer)
+    c2_assist_success = db.Column(db.Integer)
+    c2_assist_failure = db.Column(db.Integer)
+    d1_success = db.Column(db.Integer)
+    d1_failure = db.Column(db.Integer)
+    d2_success = db.Column(db.Integer)
+    d2_failure = db.Column(db.Integer)
+    lb_success = db.Column(db.Integer)
+	lb_failure = db.Column(db.Integer)
+
+    # Shooting
+    low_far_success = db.Column(db.Integer)
+    low_far_failure = db.Column(db.Integer)
+    low_close_success = db.Column(db.Integer)
+    low_close_failure = db.Column(db.Integer)
+
+    high_far_success = db.Column(db.Integer)
+    high_far_failure = db.Column(db.Integer)
+    high_close_success = db.Column(db.Integer)
+    high_close_failure = db.Column(db.Integer)
+
+    # Collection
+    hp = db.Column(db.Integer)
+    floor = db.Column(db.Integer)
+
+    # End Game
+    challenge = db.Column(db.Boolean)
+    scale = db.Column(db.Boolean)
+
+    # Defence
+    defences = db.Column(db.ARRAY(db.Integer))
+
+    def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
+    	self.match = match
+    	self.team = team
+    	
+    	for key, value in breaching_dict.items():
+			for result, value in distance_data.items():
+				setattr(self, '%s_%s' % (key, result), int(value))
+
+    	for goal, goal_data in shooting_dict.items():
+    		for distance, distance_data in goal_data.items():
+    			for result, value in distance_data.items():
+    				setattr(self, '%s_%s_%s' % (goal, distance, result), int(value))
+
+    	for key, value in collection_dict.items():
+    		setattr(self, key, int(value))
+
+    	for key, value in end_game_dict.items():
+    		setattr(self, key, bool(value))
+
+    	defences = []
+    	for defence in defences_list:
+    		match_defence = MatchDefence(defender=team, match=match, attacker=defence['team'], tactic=defence['tactic'])
+    		db.session.add(match_defence)
+    		db.session.commit()
+    		defences.append(match_defence.id)
+
+    	self.defences = defences
+        
+
+    def __repr__(self):
+        return '<MatchStats [Team: %d] [Match: %s]>' % (self.team, self.match)
+
+def _db_add_match(match_data):
+	match = match_data.pop('match')
+	match_object = Match(match=match, teams_dict=match_data)
+	db.session.add(match_object)
+	db.session.commit()
+	return match_object
+
+def _db_add_match_stats(match_stats_data):
 	""" Store match data into DB """
-	json.dump(match_data, open(os.path.join(DATABASE_DIR, '%s_%s.json' % (match, team)), 'w'), indent=2)
+	match = match_data.pop('match')
+	team = match_data.pop('team')
+	breaching = match_data.pop('breaching')
+	shooting = match_data.pop('shooting')
+	collection = match_data.pop('collection')
+	end_game = match_data.pop('end_game')
+	defences = match_data.pop('defences')
+	
+	match_stats_object = MatchStats(match=match, team=team, breaching_dict=breaching, shooting_dict=shooting,
+                                    collection_dict=collection, end_game_dict=end_game, defences_list=defeces)
+	db.session.add(match_stats_object)
+	db.session.commit()
+	return match_stats_object
 
 def _db_get_team_data(team):
 	""" Fetch team's match datas from DB """
 	return [json.load(open(match_file)) for match_file in glob.glob(os.path.join(DATABASE_DIR, '*_%s.json' % team))]
 
 def _db_get_matchs():
-	""" Fetch matche list """
+	""" Fetch match list """
 	matches = {}
 	for m in Match.query.all():
 		matches[m.match] = {'red': [m.red1, m.red2, m.red3],
@@ -78,10 +187,8 @@ def _db_get_match(match):
 def add_match():
 	try:
 		if request.method == 'POST':
-			r = request.json
-			_db_add_match(r['match'], int(r['red1']), int(r['red2']), int(r['red3']), 
-				          int(r['blue1']), int(r['blue2']), int(r['blue3']))
-			return jsonify(status='OK', match=r['match'])
+			match = _db_add_match(request.json)
+			return jsonify(status='OK', match=match.match)
 		else:
 			return app.send_static_file('add_match.html')
 	except:
@@ -113,10 +220,8 @@ def add_match_stats():
 	""" handles and stores new match data """
 	try:
 		if request.method == 'POST':
-			match = request.json['match']
-			team = request.json['team']
-			store_match(match, team, request.json)
-			return jsonify(status='OK', match=match, team=team)
+			match_stats = _db_add_match_stats(request.json)
+			return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
 		else:
 			return app.send_static_file('add_match_stats.html')
 	except:
