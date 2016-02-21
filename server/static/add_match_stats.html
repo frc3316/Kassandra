@@ -140,15 +140,13 @@
 									</div>
 								</div>
 							</div>
-							<input type="submit" />
 							<div class="alert alert-danger" ng-show="submit_error_msg">
-								<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 								{{submit_error_msg}}
 							</div>
 							<div class="alert alert-success" ng-show="submit_ok_msg">
-								<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 								{{submit_ok_msg}}
 							</div>
+							<input type="submit" />
 						</form>
 					</div>
 					
@@ -290,9 +288,11 @@
 							$http.post('/add/stats', formData, {headers: {'Content-Type': 'application/json'}})
 							.success(function (data) {
 								if (data.status == 'OK') {
+									$scope.submit_error_msg = null;
 									$scope.submit_ok_msg = 'Success! Submitted stats for match ' + data.match + ' on team ' + data.team;
 									$scope.clearForm();
 								} else {
+									$scope.submit_ok_msg = null;
 									$scope.submit_error_msg = "Error! " + data.msg;
 								}
 							});
