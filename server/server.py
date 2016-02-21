@@ -1,5 +1,6 @@
 from flask import Flask, Response, request, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects import postgresql
 import traceback
 import glob
 import json
@@ -106,7 +107,7 @@ class MatchStats(db.Model):
     scale = db.Column(db.Boolean)
 
     # Defence
-    defences = db.Column(db.ARRAY(db.Integer))
+    defences = db.Column(postgresql.ARRAY(db.Integer))
 
     def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
         self.match = match
