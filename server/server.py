@@ -339,22 +339,19 @@ def get_alliance_stats(match, alliance):
         return jsonify(status='ERROR', match=match, alliance=alliance,
                        msg=("Alliance %r does not exist." % alliance))
         
-        matches = []
-        for team_number in alliance_teams:
-            try:
-                matches.extend(_db_get_match_stats(team=team_number))
-            except Exception, ex:
-                return jsonify(status='ERROR', msg=ex.message)
-
+    matches = []
+    for team_number in alliance_teams:
         try:
-            stats = statsmgr.run_handlers(matches)
+            matches.extend(_db_get_match_stats(team=team_number))
         except Exception, ex:
             return jsonify(status='ERROR', msg=ex.message)
-            
-        return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
 
+    try:
+        stats = statsmgr.run_handlers(matches)
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
+
+    return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
     
 if __name__ == '__main__':
     app.debug = True
