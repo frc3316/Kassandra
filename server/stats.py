@@ -23,9 +23,16 @@ class StatsManager(object):
         return handler
     
     def run_handlers(self, match_data):
-        return {handler_name: handler.filter(match_data) for handler_name, handler in self._handlers.items()}
+    	stats = {}
+    	for handler_name, handler in self._handlers.items():
+    		try:
+    			stats[handler_name] = handler.filter(match_data)
+    		except Exception, ex:
+    			stats[handler_name] = {'status': 'ERROR', 'msg': ex.message}
 
-        
+        return stats
+
+
 statsmgr = StatsManager()
 
 

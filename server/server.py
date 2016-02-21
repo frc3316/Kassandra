@@ -237,47 +237,47 @@ def _db_get_match(match):
 ## Flask Server Routes
 @app.route('/add/match', methods=['GET', 'POST'])
 def add_match():
-    try:
-        if request.method == 'POST':
+    if request.method == 'POST':
+        try:
             match = _db_add_match(request.json)
-            return jsonify(status='OK', match=match.match)
-        else:
-            return app.send_static_file('add_match.html')
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+        except Exception, ex:
+            return jsonify(status='ERROR', msg=ex.message)
+
+        return jsonify(status='OK', match=match.match)
+    else:
+        return app.send_static_file('add_match.html')
 
 @app.route('/matches')
 def get_matches():
     """ returns the matches list """
     try:
         return jsonify(_db_get_matchs())
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
 
 @app.route('/match/<match>')
 def get_match(match):
     """ returns the matches list """
     try:
-        match = _db_get_match(match)
-        if not match:
-            return jsonify(status='ERROR', match=match,
-                           msg=("Didn't find match %s." % match))
+        match_data = _db_get_match(match)
+    except Exception, ex:
+        return jsonify(status='ERROR', match=match, msg=ex.message)
 
-        return jsonify()
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+    if not match:
+        return jsonify(status='ERROR', match=match,
+                       msg=("Didn't find match %s." % match))
+
+    return jsonify(match_data)
 
 @app.route('/add/stats', methods=['GET', 'POST'])
 def add_match_stats():
     """ handles and stores new match data """
     try:
-        if request.method == 'POST':
-            match_stats = _db_add_match_stats(request.json)
-            return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
-        else:
-            return app.send_static_file('add_match_stats.html')
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+        match_stats = _db_add_match_stats(request.json)
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
+
+    return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
 
 @app.route('/stats')
 def get_team_stats_list():
@@ -285,59 +285,72 @@ def get_team_stats_list():
     try:
         collected_stats = _db_get_match_stats()
         match_list = _db_get_matchs()
-        stats_by_team = defaultdict(int)
-        stats_by_match = defaultdict(lambda: {'red': 0, 'blue': 0})
-        for match_stats in collected_stats:
-            team = match_stats.team
-            match = match_stats.match
-            alliance = 'red' if team in match_list[match]['red'] else 'blue'
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
 
-            stats_by_team[team] += 1
-            stats_by_match[match][alliance] += 1
+    stats_by_team = defaultdict(int)
+    stats_by_match = defaultdict(lambda: {'red': 0, 'blue': 0})
+    for match_stats in collected_stats:
+        team = match_stats.team
+        match = match_stats.match
+        alliance = 'red' if team in match_list[match]['red'] else 'blue'
 
-        teams = sorted(stats_by_team.items())
-        matches = sorted(stats_by_match.items())
+        stats_by_team[team] += 1
+        stats_by_match[match][alliance] += 1
 
-        return jsonify(status='OK', teams=teams, matches=matches)
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+    teams = sorted(stats_by_team.items())
+    matches = sorted(stats_by_match.items())
+
+    return jsonify(status='OK', teams=teams, matches=matches)
 
 @app.route('/stats/team/<int:team_number>')
 def get_team_stats(team_number):
     """ gets a team's statistics """
     try:
         matches = _db_get_match_stats(team=team_number)
-        if not matches:
-            return jsonify(status='ERROR', team_number=team_number,
-                           msg=("No matches for team %d." % team_number))
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
 
+    if not matches:
+        return jsonify(status='ERROR', team_number=team_number,
+                       msg=("No matches for team %d." % team_number))
+
+    try:
         stats = statsmgr.run_handlers(matches)
-        return jsonify(status='OK', team=team_number, stats=stats)
-    except:
-        sys.stderr.write(traceback.format_exc() + "\n")
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
+
+    return jsonify(status='OK', team=team_number, stats=stats)
 
 @app.route('/stats/match/<match>/<alliance>')
 def get_alliance_stats(match, alliance):
     """ gets a match alliance's statistics """
     try:
         match_alliances = _db_get_match(match)
-        if match_alliances is None:
-            return jsonify(status='ERROR', match=match, alliance=alliance,
-                           msg=("Match %r does not exist." % match))
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=ex.message)
 
-        alliance_teams = match_alliances.get(alliance)
-        if alliance_teams is None:
-            return jsonify(status='ERROR', match=match, alliance=alliance,
-                           msg=("Alliance %r does not exist." % alliance))
+    if match_alliances is None:
+        return jsonify(status='ERROR', match=match, alliance=alliance,
+                       msg=("Match %r does not exist." % match))
+    
+    alliance_teams = match_alliances.get(alliance)
+    if alliance_teams is None:
+        return jsonify(status='ERROR', match=match, alliance=alliance,
+                       msg=("Alliance %r does not exist." % alliance))
         
         matches = []
         for team_number in alliance_teams:
-            matches.extend(_db_get_match_stats(team=team_number))
-        if not matches:
-            return jsonify(status='ERROR', match=match, alliance=alliance,
-                           msg=("No matches for teams %d, %d, %d." % tuple(alliance_teams)))
+            try:
+                matches.extend(_db_get_match_stats(team=team_number))
+            except Exception, ex:
+                return jsonify(status='ERROR', msg=ex.message)
 
-        stats = statsmgr.run_handlers(matches)
+        try:
+            stats = statsmgr.run_handlers(matches)
+        except Exception, ex:
+            return jsonify(status='ERROR', msg=ex.message)
+            
         return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
     except:
         sys.stderr.write(traceback.format_exc() + "\n")
