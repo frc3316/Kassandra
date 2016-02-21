@@ -61,7 +61,7 @@ class GoalsScored(StatsHandler):
 
     @staticmethod
     def _variance(values):
-        average = sum(values) / en(values)
+        average = sum(values) / len(values)
         return sum(map(lambda v: (v - average) ** 2, values)) / 2
 
     @staticmethod
@@ -118,7 +118,7 @@ class DeffencesCrossed(StatsHandler):
 
     @staticmethod
     def _variance(values):
-        average = sum(values) / en(values)
+        average = sum(values) / len(values)
         return sum(map(lambda v: (v - average) ** 2, values)) / 2
 
     @staticmethod
