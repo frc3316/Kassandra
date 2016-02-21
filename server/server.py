@@ -269,12 +269,15 @@ def get_match(match):
 @app.route('/add/stats', methods=['GET', 'POST'])
 def add_match_stats():
     """ handles and stores new match data """
-    try:
-        match_stats = _db_add_match_stats(request.json)
-    except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+    if request.method == 'POST':
+        try:
+            match_stats = _db_add_match_stats(request.json)
+        except Exception, ex:
+            return jsonify(status='ERROR', msg=ex.message)
 
-    return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
+        return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
+    else:
+        return app.send_static_file('add_match_stats.html')
 
 @app.route('/stats')
 def get_team_stats_list():
