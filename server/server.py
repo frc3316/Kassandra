@@ -27,12 +27,12 @@ def init_db():
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match = db.Column(db.String(6), unique=True)
-    red1 = db.Column(db.Integer)
-    red2 = db.Column(db.Integer)
-    red3 = db.Column(db.Integer)
-    blue1 = db.Column(db.Integer)
-    blue2 = db.Column(db.Integer)
-    blue3 = db.Column(db.Integer)
+    red1 = db.Column(db.Integer, nullable=False)
+    red2 = db.Column(db.Integer, nullable=False)
+    red3 = db.Column(db.Integer, nullable=False)
+    blue1 = db.Column(db.Integer, nullable=False)
+    blue2 = db.Column(db.Integer, nullable=False)
+    blue3 = db.Column(db.Integer, nullable=False)
 
 
     def __init__(self, match, teams_dict):
@@ -49,10 +49,10 @@ class Match(db.Model):
 
 class MatchDefence(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    defender = db.Column(db.Integer)
-    attacker = db.Column(db.Integer)
-    match = db.Column(db.String(6))
-    tactic = db.Column(db.String(64))
+    defender = db.Column(db.Integer, nullable=False)
+    attacker = db.Column(db.Integer, nullable=False)
+    match = db.Column(db.String(6), nullable=False)
+    tactic = db.Column(db.String(64), nullable=False)
     
     def __init__(self, defender, attacker, match, tactic):
         self.defender = defender
@@ -71,51 +71,51 @@ class MatchDefence(db.Model):
 
 class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    match = db.Column(db.String(6))
-    team = db.Column(db.Integer)
+    match = db.Column(db.String(6), nullable=False)
+    team = db.Column(db.Integer, nullable=False)
 
     # Breaching
-    a1_success = db.Column(db.Integer)
-    a1_failure = db.Column(db.Integer)
-    a2_success = db.Column(db.Integer)
-    a2_failure = db.Column(db.Integer)
-    b1_success = db.Column(db.Integer)
-    b1_failure = db.Column(db.Integer)
-    b2_success = db.Column(db.Integer)
-    b2_failure = db.Column(db.Integer)
-    c1_success = db.Column(db.Integer)
-    c1_failure = db.Column(db.Integer)
-    c2_success = db.Column(db.Integer)
-    c2_failure = db.Column(db.Integer)
-    c1_assist_success = db.Column(db.Integer)
-    c1_assist_failure = db.Column(db.Integer)
-    c2_assist_success = db.Column(db.Integer)
-    c2_assist_failure = db.Column(db.Integer)
-    d1_success = db.Column(db.Integer)
-    d1_failure = db.Column(db.Integer)
-    d2_success = db.Column(db.Integer)
-    d2_failure = db.Column(db.Integer)
-    lb_success = db.Column(db.Integer)
-    lb_failure = db.Column(db.Integer)
+    a1_success = db.Column(db.Integer, default=0)
+    a1_failure = db.Column(db.Integer, default=0)
+    a2_success = db.Column(db.Integer, default=0)
+    a2_failure = db.Column(db.Integer, default=0)
+    b1_success = db.Column(db.Integer, default=0)
+    b1_failure = db.Column(db.Integer, default=0)
+    b2_success = db.Column(db.Integer, default=0)
+    b2_failure = db.Column(db.Integer, default=0)
+    c1_success = db.Column(db.Integer, default=0)
+    c1_failure = db.Column(db.Integer, default=0)
+    c2_success = db.Column(db.Integer, default=0)
+    c2_failure = db.Column(db.Integer, default=0)
+    c1_assist_success = db.Column(db.Integer, default=0)
+    c1_assist_failure = db.Column(db.Integer, default=0)
+    c2_assist_success = db.Column(db.Integer, default=0)
+    c2_assist_failure = db.Column(db.Integer, default=0)
+    d1_success = db.Column(db.Integer, default=0)
+    d1_failure = db.Column(db.Integer, default=0)
+    d2_success = db.Column(db.Integer, default=0)
+    d2_failure = db.Column(db.Integer, default=0)
+    lb_success = db.Column(db.Integer, default=0)
+    lb_failure = db.Column(db.Integer, default=0)
 
     # Shooting
-    low_far_success = db.Column(db.Integer)
-    low_far_failure = db.Column(db.Integer)
-    low_close_success = db.Column(db.Integer)
-    low_close_failure = db.Column(db.Integer)
+    low_far_success = db.Column(db.Integer, default=0)
+    low_far_failure = db.Column(db.Integer, default=0)
+    low_close_success = db.Column(db.Integer, default=0)
+    low_close_failure = db.Column(db.Integer, default=0)
 
-    high_far_success = db.Column(db.Integer)
-    high_far_failure = db.Column(db.Integer)
-    high_close_success = db.Column(db.Integer)
-    high_close_failure = db.Column(db.Integer)
+    high_far_success = db.Column(db.Integer, default=0)
+    high_far_failure = db.Column(db.Integer, default=0)
+    high_close_success = db.Column(db.Integer, default=0)
+    high_close_failure = db.Column(db.Integer, default=0)
 
     # Collection
-    hp = db.Column(db.Integer)
-    floor = db.Column(db.Integer)
+    hp = db.Column(db.Integer, default=0)
+    floor = db.Column(db.Integer, default=0)
 
     # End Game
-    challenge = db.Column(db.Boolean)
-    scale = db.Column(db.Boolean)
+    challenge = db.Column(db.Boolean, default=False)
+    scale = db.Column(db.Boolean, default=False)
 
     # Defence
     defences = db.Column(postgresql.ARRAY(db.Integer))
