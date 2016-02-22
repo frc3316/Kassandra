@@ -144,4 +144,32 @@ class DeffencesCrossed(StatsHandler):
         DEFFENCES = ['a1','a2','b1','b2','c1','c2','c1_assist', 'c2_assist', 'd1', 'd2']
         breaching_success={deffence:[match[deffence]['success'] for match in breaching_data] for deffence in DEFFENCES}
         breaching_failure={deffence:[match[deffence]['failure'] for match in breaching_data] for deffence in DEFFENCES}
-        return {deffence : DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}    
+        return {deffence : DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}
+
+
+@statsmgr.register_handler
+class CollectionHandler(object):
+    KEY = "collection"
+    def filter(self, match_data):
+        return {}
+
+
+@statsmgr.register_handler
+class EndGamelHandler(object):
+    KEY = "end_game"
+    def filter(self, match_data):
+        return {}
+
+
+@statsmgr.register_handler
+class DefenceHandler(object):
+    KEY = "defences"
+    def filter(self, match_data):
+        return []
+
+
+@statsmgr.register_handler
+class GeneralHandler(object):
+    KEY = "general"
+    def filter(self, match_data):
+        return {}
