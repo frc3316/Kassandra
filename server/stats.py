@@ -1,3 +1,5 @@
+import traceback
+
 SIZE_LIST = ['4', '5', '6']
 COLOR_LIST = ['success', 'warning', 'danger']
 
@@ -28,7 +30,7 @@ class StatsManager(object):
     		try:
     			stats[handler_name] = handler.filter(match_data)
     		except Exception, ex:
-    			stats[handler_name] = {'status': 'ERROR', 'msg': ex.message}
+    			stats[handler_name] = {'status': 'ERROR', 'msg': traceback.format_exc()}
 
         return stats
 

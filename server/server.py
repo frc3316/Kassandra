@@ -247,7 +247,7 @@ def add_match():
         try:
             match = _db_add_match(request.json)
         except Exception, ex:
-            return jsonify(status='ERROR', msg=ex.message)
+            return jsonify(status='ERROR', msg=traceback.format_exc())
 
         return jsonify(status='OK', match=match.match)
     else:
@@ -259,7 +259,7 @@ def get_matches():
     try:
         return jsonify(_db_get_matchs())
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
 @app.route('/match/<match>')
 def get_match(match):
@@ -267,7 +267,7 @@ def get_match(match):
     try:
         match_data = _db_get_match(match)
     except Exception, ex:
-        return jsonify(status='ERROR', match=match, msg=ex.message)
+        return jsonify(status='ERROR', match=match, msg=traceback.format_exc())
 
     if not match:
         return jsonify(status='ERROR', match=match,
@@ -282,7 +282,7 @@ def add_match_stats():
         try:
             match_stats = _db_add_match_stats(request.json)
         except Exception, ex:
-            return jsonify(status='ERROR', msg=ex.message)
+            return jsonify(status='ERROR', msg=traceback.format_exc())
 
         return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
     else:
@@ -295,7 +295,7 @@ def get_team_stats_list():
         collected_stats = _db_get_match_stats()
         match_list = _db_get_matchs()
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
     # Populate base dicts
     stats_by_team = {}
@@ -328,13 +328,26 @@ def get_team_stats_list():
 
     return jsonify(status='OK', teams=teams, matches=matches)
 
+@app.route('/raw/team/<int:team_number>')
+def get_raw_team_stats(team_number):
+    try:
+        matches = _db_get_match_stats(team=team_number)
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=traceback.format_exc())
+
+    if not matches:
+        return jsonify(status='ERROR', team_number=team_number,
+                       msg=("No matches for team %d." % team_number))
+
+    return jsonify(status='OK', team=team_number, matches=matches)
+
 @app.route('/stats/team/<int:team_number>')
 def get_team_stats(team_number):
     """ gets a team's statistics """
     try:
         matches = _db_get_match_stats(team=team_number)
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
     if not matches:
         return jsonify(status='ERROR', team_number=team_number,
@@ -343,7 +356,7 @@ def get_team_stats(team_number):
     try:
         stats = statsmgr.run_handlers(matches)
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='OK', team=team_number, stats=stats)
 
@@ -353,7 +366,7 @@ def get_alliance_stats(match, alliance):
     try:
         match_alliances = _db_get_match(match)
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
     if match_alliances is None:
         return jsonify(status='ERROR', match=match, alliance=alliance,
@@ -371,7 +384,7 @@ def get_alliance_stats(match, alliance):
             if team_stats:
                 matches.extend(team_stats)
         except Exception, ex:
-            return jsonify(status='ERROR', msg=ex.message)
+            return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='ERROR', match=match, alliance=alliance,
                    msg=("No stats recorded for teams: %d, %d or %d." % tuple(alliance_teams)))
@@ -379,7 +392,7 @@ def get_alliance_stats(match, alliance):
     try:
         stats = statsmgr.run_handlers(matches)
     except Exception, ex:
-        return jsonify(status='ERROR', msg=ex.message)
+        return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
     
