@@ -222,11 +222,11 @@ class EndGameHandler(object):
 
         stats = {'challenge': {}, 'scale': {}}
         stats['challenge']['color'] = self.PERCENTAGE_GRANULATOR.get(challenge_percentage)
-        stats['challenge']['amount'] = '%.0f%%' % (challenge_percentage * 100)
+        stats['challenge']['percentage'] = '%.0f%%' % (challenge_percentage * 100)
         stats['challenge']['size'] = self.AMOUNT_GRANULATOR.get(total_challenge)
 
         stats['scale']['color'] = self.PERCENTAGE_GRANULATOR.get(scale_percentage)
-        stats['scale']['amount'] = '%.0f%%' % (scale_percentage * 100)
+        stats['scale']['percentage'] = '%.0f%%' % (scale_percentage * 100)
         stats['scale']['size'] = self.AMOUNT_GRANULATOR.get(total_scale)
 
         return stats
