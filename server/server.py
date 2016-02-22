@@ -232,6 +232,15 @@ def _db_get_match(match):
         return m.to_dict().get(match)
 
 ## Flask Server Routes
+@app.route('/img/<path:path>')
+def send_img(path):
+    return send_from_directory('img', path)
+
+@app.route('/view/team/<int:team_number>')
+@app.route('/view/match/<match>/<alliance>')
+def view_team_stats(team_number=None, match=None, alliance=None):
+    return app.send_static_file('view_match_stats.html')
+
 @app.route('/add/match', methods=['GET', 'POST'])
 def add_match():
     if request.method == 'POST':
