@@ -185,7 +185,7 @@ class CollectionHandler(object):
         total_hp = float(sum(hp_data))
         per_game_hp = total_hp / amount
 
-        stats = {}
+        stats = {'floor': {}, 'hp': {}}
         stats['floor']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(per_game_floor)
         stats['floor']['amount'] = '%.2f' % per_game_floor
         stats['floor']['size'] = self.AMOUNT_GRANULATOR.get(total_floor)
