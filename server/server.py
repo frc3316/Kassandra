@@ -1,4 +1,4 @@
-from flask import Flask, Response, request, jsonify, url_for
+from flask import Flask, Response, request, jsonify, url_for, send_from_directory
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
 from collections import defaultdict
@@ -234,7 +234,7 @@ def _db_get_match(match):
 ## Flask Server Routes
 @app.route('/img/<path:path>')
 def send_img(path):
-    return app.send_from_directory('img', path)
+    return send_from_directory('img', path)
 
 @app.route('/view/team/<int:team_number>')
 @app.route('/view/match/<match>/<alliance>')
