@@ -129,7 +129,7 @@ class DefencesCrossed(StatsHandler):
         total_crossed = float(sum(success))
         total_breaches = float(sum(failure) + sum(success))
         if amount == 0 or total_breaches == 0:
-            return stats
+            return None
             
         stats['successful'] = '%.2f' % (total_crossed/ amount)
         stats['attempted'] = '%.2f' % (total_breaches / amount)
@@ -146,13 +146,18 @@ class DefencesCrossed(StatsHandler):
         breaching_success={defence:[match[defence]['success'] for match in breaching_data] for defence in DEFENCES}
         breaching_failure={defence:[match[defence]['failure'] for match in breaching_data] for defence in DEFENCES}
         
-        full_stats = {defence : DefencesCrossed._run_stats(breaching_success[defence], breaching_failure[defence]) for defence in DEFENCES}
-        
+        full_stats = []
         for defence, name in zip(DEFENCES, NAMES):
-            full_stats[defence]['type'] = defence
-            full_stats[defence]['name'] = name
+            stats = DefencesCrossed._run_stats(breaching_success[defence],
+                                               breaching_failure[defence])
+            if stats is None:
+                continue  # Filter defences which weren't attempted
 
-        return full_stats
+            stats['type'] = defence
+            stats['name'] = name
+            full_stats.append(stats)
+
+        return sorted(full_stats, key=lambda x: x['successful'])
 
 
 @statsmgr.register_handler
