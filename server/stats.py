@@ -200,8 +200,36 @@ class CollectionHandler(object):
 @statsmgr.register_handler
 class EndGamelHandler(object):
     KEY = "end_game"
+
+    HIGH_AMOUNT = 4
+    MED_AMOUNT = 2
+    AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT, MED_AMOUNT], SIZE_LIST)
+
+    HIGH_PERCENTAGE = 0.66
+    MED_PERCENTAGE = 0.34
+    PERCENTAGE_GRANULATOR = Granulator([HIGH_PERCENTAGE,
+                                        MED_PERCENTAGE], COLOR_LIST)
+
     def filter(self, match_data):
-        return {}
+        challenge_data = [match['end_game']['challenge'] for match in match_data]
+        scale_data = [match['end_game']['scale'] for match in match_data]
+
+        amount = len(match_data)
+        total_challenge = float(sum(challenge_data))
+        challenge_percentage = total_challenge / amount
+        total_scale = float(sum(scale_data))
+        scale_percentage = total_scale / amount
+
+        stats = {'challenge': {}, 'scale': {}}
+        stats['challenge']['color'] = self.PERCENTAGE_GRANULATOR.get(challenge_percentage)
+        stats['challenge']['amount'] = '%.0f%%' % (challenge_percentage * 100)
+        stats['challenge']['size'] = self.AMOUNT_GRANULATOR.get(total_challenge)
+
+        stats['scale']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(scale_percentage)
+        stats['scale']['amount'] = '%.0f%%' % (scale_percentage * 100)
+        stats['scale']['size'] = self.AMOUNT_GRANULATOR.get(total_hp)
+
+        return stats
 
 
 @statsmgr.register_handler
