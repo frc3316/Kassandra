@@ -1,4 +1,4 @@
-SIZE_LIST = ['3', '2', '1']
+SIZE_LIST = ['4', '5', '6']
 COLOR_LIST = ['success', 'warning', 'danger']
 
 
@@ -11,7 +11,7 @@ class Granulator(object):
         for thresh, ret in zip(self._thresholds, self._rets):
             if value >= thresh:
                 return ret
-        return ret[-1]
+        return self._rets[-1]
             
 
 class StatsManager(object):
@@ -99,7 +99,7 @@ class GoalsScored(StatsHandler):
                     high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
                               close=GoalsScored._run_stats(high_close_success, high_close_failure)))
 @statsmgr.register_handler        
-class DeffencesCrossed(StatsHandler):
+class DefencesCrossed(StatsHandler):
     KEY = "breaching"
     HIGH_AMOUNT_OF_BREACHES = 6
     MED_AMOUNT_OF_BREACHES = 3
@@ -123,7 +123,7 @@ class DeffencesCrossed(StatsHandler):
 
     @staticmethod
     def _run_stats(success, failure):
-        stats = DeffencesCrossed.STATS_STRUCT.copy()
+        stats = DefencesCrossed.STATS_STRUCT.copy()
 
         amount = len(success)
         total_crossed = float(sum(success))
@@ -133,18 +133,26 @@ class DeffencesCrossed(StatsHandler):
             
         stats['successful'] = '%.2f' % (total_crossed/ amount)
         stats['attempted'] = '%.2f' % (total_breaches / amount)
-        stats['size'] = DeffencesCrossed.AMOUNT_GRANULATOR.get(total_breaches)
-        stats['color'] = DeffencesCrossed.PERCENTAGE_GRANULATOR.get(total_crossed / total_breaches)
-        stats['variant'] = DeffencesCrossed.HIGH_VARIANCE < DeffencesCrossed._variance([float(s) / (s + f) for (s, f) in zip(success, failure)])
+        stats['size'] = DefencesCrossed.AMOUNT_GRANULATOR.get(total_breaches)
+        stats['color'] = DefencesCrossed.PERCENTAGE_GRANULATOR.get(total_crossed / total_breaches)
+        stats['variant'] = DefencesCrossed.HIGH_VARIANCE < DefencesCrossed._variance([float(s) / (s + f) for (s, f) in zip(success, failure)])
         
         return stats
         
     def filter(self, match_data):
         breaching_data = [match['breaching'] for match in match_data]
-        DEFFENCES = ['a1','a2','b1','b2','c1','c2','c1_assist', 'c2_assist', 'd1', 'd2']
-        breaching_success={deffence:[match[deffence]['success'] for match in breaching_data] for deffence in DEFFENCES}
-        breaching_failure={deffence:[match[deffence]['failure'] for match in breaching_data] for deffence in DEFFENCES}
-        return {deffence : DeffencesCrossed._run_stats(breaching_success[deffence], breaching_failure[deffence]) for deffence in DEFFENCES}
+        DEFENCES = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2', 'c1_assist', 'c2_assist', 'd1', 'd2', 'lb']
+        NAMES = ['Portcullis', 'Cheval de Frise', 'Ramparts', 'Moat', 'Draw Bridge', 'Sally Port', 'Draw Bridge Assist', 'Sally Port Assist', 'Rock Wall', 'Rough Terrain', 'Low Bar']
+        breaching_success={defence:[match[defence]['success'] for match in breaching_data] for defence in DEFENCES}
+        breaching_failure={defence:[match[defence]['failure'] for match in breaching_data] for defence in DEFENCES}
+        
+        full_stats = {defence : DefencesCrossed._run_stats(breaching_success[defence], breaching_failure[defence]) for defence in DEFENCES}
+        
+        for defence, name in zip(DEFENCES, NAMES):
+            full_stats[defence]['type'] = defence
+            full_stats[defence]['name'] = name
+
+        return full_stats
 
 
 @statsmgr.register_handler
