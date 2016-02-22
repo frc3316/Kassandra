@@ -227,7 +227,7 @@ class EndGameHandler(object):
 
         stats['scale']['color'] = self.PERCENTAGE_GRANULATOR.get(scale_percentage)
         stats['scale']['amount'] = '%.0f%%' % (scale_percentage * 100)
-        stats['scale']['size'] = self.AMOUNT_GRANULATOR.get(total_hp)
+        stats['scale']['size'] = self.AMOUNT_GRANULATOR.get(total_scale)
 
         return stats
 
