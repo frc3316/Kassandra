@@ -198,7 +198,7 @@ class CollectionHandler(object):
 
 
 @statsmgr.register_handler
-class EndGamelHandler(object):
+class EndGameHandler(object):
     KEY = "end_game"
 
     HIGH_AMOUNT = 4
@@ -225,7 +225,7 @@ class EndGamelHandler(object):
         stats['challenge']['amount'] = '%.0f%%' % (challenge_percentage * 100)
         stats['challenge']['size'] = self.AMOUNT_GRANULATOR.get(total_challenge)
 
-        stats['scale']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(scale_percentage)
+        stats['scale']['color'] = self.PERCENTAGE_GRANULATOR.get(scale_percentage)
         stats['scale']['amount'] = '%.0f%%' % (scale_percentage * 100)
         stats['scale']['size'] = self.AMOUNT_GRANULATOR.get(total_hp)
 
