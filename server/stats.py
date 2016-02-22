@@ -157,14 +157,42 @@ class DefencesCrossed(StatsHandler):
             stats['name'] = name
             full_stats.append(stats)
 
-        return sorted(full_stats, key=lambda x: x['successful'])
+        return sorted(full_stats, key=lambda x: x['successful'], reverse=True)
 
 
 @statsmgr.register_handler
 class CollectionHandler(object):
     KEY = "collection"
+
+    HIGH_AMOUNT_OF_COLLECTIONS = 20
+    MED_AMOUNT_OF_COLLECTIONS = 10
+    AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT_OF_BREACHES, MED_AMOUNT_OF_BREACHES], SIZE_LIST)
+
+    HIGH_AMOUNT_OF_COLLECTIONS_PER_GAME = 6
+    MED_AMOUNT_OF_COLLECTIONS_PER_GAME = 3
+    AMOUNT_PER_GAME_GRANULATOR = Granulator([HIGH_AMOUNT_OF_COLLECTIONS_PER_GAME,
+                                             MED_AMOUNT_OF_COLLECTIONS_PER_GAME], COLOR_LIST)
+
     def filter(self, match_data):
-        return {}
+        floor_data = [match['collection']['floor'] for match in match_data]
+        hp_data = [match['collection']['hp'] for match in match_data]
+
+        amount = len(match_data)
+        total_floor = float(sum(floor_data))
+        per_game_floor = total_floor / amount
+        total_hp = float(sum(hp_data))
+        per_game_hp = total_hp / amount
+
+        stats = {}
+        stats['floor']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(per_game_floor)
+        stats['floor']['amount'] = '%.2f' % per_game_floor
+        stats['floor']['size'] = self.AMOUNT_GRANULATOR.get(total_floor)
+
+        stats['hp']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(per_game_hp)
+        stats['hp']['amount'] = '%.2f' % per_game_hp
+        stats['hp']['size'] = self.AMOUNT_GRANULATOR.get(total_hp)
+
+        return stats
 
 
 @statsmgr.register_handler
