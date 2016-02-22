@@ -300,8 +300,8 @@ def get_team_stats_list():
 
     # Populate dicts with actual data
     for match_stats in collected_stats:
-        team = match_stats.team
-        match = match_stats.match
+        team = match_stats['team']
+        match = match_stats['match']
         if match not in match_list:
             continue   # Illegal match stats entry...
 
