@@ -236,11 +236,11 @@ class EndGameHandler(object):
 class DefenceHandler(object):
     KEY = "defences"
     def filter(self, match_data):
-        return []
+        return itertools.chain(*[match['defences'] for match in match_data])
 
 
 @statsmgr.register_handler
 class GeneralHandler(object):
     KEY = "general"
     def filter(self, match_data):
-        return {}
+        return {'total_matches': len(match_data)}
