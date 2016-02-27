@@ -421,11 +421,11 @@ def setup_export():
         matches = _db_get_match_stats()
     except Exception, ex:
         return jsonify(status='ERROR', msg=traceback.format_exc())
-    
+
     # To json and compress
     json_stats = json.dumps(matches)
-    make_response(zlib.compress(json_stats))
-
+    response = make_response(zlib.compress(json_stats))
+    
     # Makes the browser recognize this is a download
     response.headers["Content-Disposition"] = "attachment; filename=kassandra_export.gzip"
     return response
