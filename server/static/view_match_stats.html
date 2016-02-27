@@ -106,7 +106,7 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 		{{fetch_error_msg}}
 	</div>
 	<div class="well-sm bg-info" ng-show="general.total_matches" style="position:absolute;top:5px;left:5px;z-index:10;opacity:0.8">
-		{{total_matches}} Records
+		{{general.total_matches}} Records
 	</div>
 	<div class="well-sm bg-primary" ng-show="team" style="position:absolute;top:5px;right:5px;z-index:10;opacity:0.8">
 		Team # {{team}}
