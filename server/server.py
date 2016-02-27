@@ -172,8 +172,9 @@ class MatchStats(db.Model):
             end_game_dict[key] = getattr(self, key)
 
         defences_list = []
-        for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
-            defences_list.append({'team': defence.attacker, 'tactic': defence.tactic})
+        if self.defences:
+            for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
+                defences_list.append({'team': defence.attacker, 'tactic': defence.tactic})
 
         return {'team': self.team,
                 'match': self.match,
@@ -416,11 +417,13 @@ def setup_event(event_key):
 @app.route('/setup/export')
 def setup_export():
     stats = []
-    for match_stats in MatchStats.query.all():
-        stats.append(match_stats.to_dict())
+    try:
+        matches = _db_get_match_stats()
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=traceback.format_exc())
     
     # To json and compress
-    json_stats = json.dumps(stats)
+    json_stats = json.dumps(matches)
     make_response(zlib.compress(json_stats))
 
     # Makes the browser recognize this is a download
