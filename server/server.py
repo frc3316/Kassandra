@@ -1,11 +1,11 @@
-from flask import Flask, Response, request, jsonify, url_for, send_from_directory
+from flask import Flask, Response, request, jsonify, url_for, send_from_directory, make_response
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
 from collections import defaultdict
 from setup import *
 
 import traceback
-import glob
+import zlib
 import json
 import sys
 import os
@@ -412,6 +412,20 @@ def setup_event(event_key):
         return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='OK', event_key=event_key, count=count)
+
+@app.route('/setup/export')
+def setup_export():
+    stats = []
+    for match_stats in MatchStats.query.all():
+        stats.append(match_stats.to_dict())
+    
+    # To json and compress
+    json_stats = json.dumps(stats)
+    make_response(zlib.compress(json_stats))
+
+    # Makes the browser recognize this is a download
+    response.headers["Content-Disposition"] = "attachment; filename=kassandra_export.gzip"
+    return response
 
     
 if __name__ == '__main__':
