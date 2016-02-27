@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Kassandra - Login</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+		<script type="text/javascript">
+		angular.module('loginForm', [])
+			.controller('LoginController', function ($scope, $http) {
+						$scope.submit_error_msg = null;
+						$scope.submit_ok_msg = null;
+						
+						// Process the form
+						$scope.processForm = function () {
+							var formData = { 'password': $scope.password };
+							$http.post('/login', formData, {headers: {'Content-Type': 'application/json'}})
+							.success(function (data) {
+								if (data.status == 'OK') {
+									$scope.submit_error_msg = null;
+									$scope.submit_ok_msg = 'Logged in successfully!';
+								} else {
+									$scope.submit_ok_msg = null;
+									$scope.submit_error_msg = "Error! " + data.msg;
+								}
+							});
+						};
+					}
+					)
+		</script>
+
+		<style type="text/css">
+		body {
+		  background-color:#fff;
+		  -webkit-font-smoothing: antialiased;
+		  font: normal 14px Roboto,arial,sans-serif;
+		  background: url("/img/Kassandra.jpeg") no-repeat center 10% fixed; 
+		  -webkit-background-size: cover;
+		  -moz-background-size: cover;
+		  -o-background-size: cover;
+		  background-size: cover;
+		}
+
+		.container {
+		    padding: 25px;
+		    position: fixed;
+		}
+
+		h4 { 
+		 border:0 solid #fff; 
+		 border-bottom-width:1px;
+		 padding-bottom:10px;
+		 text-align: center;
+		 color: #fff;
+		 text-shadow: 1px 1px 2px #333;
+		}
+
+		.form-control {
+		    border-radius: 10px;
+		}
+
+		.wrapper {
+		    text-align: center;
+		}
+		</style>
+	</head>
+	<body ng-app="loginForm">
+		<div class="container" ng-controller="LoginController">
+		    <div class="row">
+		        <div class="col-md-offset-5 col-md-3">
+		        	<form novalidate ng-submit="processForm()">
+		            <h4><span class="glyphicon glyphicon-stats"></span> Welcome To Kassandra</h4>
+		            <input type="password" ng-model="password" class="form-control input-sm chat-input" placeholder="password" />
+		            <br />
+		            <div class="wrapper">
+		            	<input type="submit" class="btn btn-primary btn-md" ng-click="processForm()" value="login" />
+		            </div>
+		            <br />
+		            <div class="alert alert-danger" ng-show="submit_error_msg">
+						{{submit_error_msg}}
+					</div>
+					<div class="alert alert-success" ng-show="submit_ok_msg">
+						{{submit_ok_msg}}
+					</div>
+		        	</form>
+		        </div>
+		    </div>
+		</div>
+	</body>
+</html>

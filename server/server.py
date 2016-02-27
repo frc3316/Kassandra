@@ -1,4 +1,5 @@
 from flask import Flask, Response, request, jsonify, url_for, send_from_directory, make_response
+from flask.ext.login import login_required, login_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
 from collections import defaultdict
@@ -21,6 +22,7 @@ app.config['PROPAGATE_EXCEPTIONS'] = False
 db = SQLAlchemy(app)
 
 DATABASE_DIR = "database"
+SECRET = 'password'
 
 ## Postgress Database Stuff
 class Match(db.Model):
@@ -245,6 +247,7 @@ def view_team_stats(team_number=None, match=None, alliance=None):
     return app.send_static_file('view_match_stats.html')
 
 @app.route('/add/match', methods=['GET', 'POST'])
+@login_required
 def add_match():
     if request.method == 'POST':
         try:
@@ -279,6 +282,7 @@ def get_match(match):
     return jsonify(match_data)
 
 @app.route('/add/stats', methods=['GET', 'POST'])
+@login_required
 def add_match_stats():
     """ handles and stores new match data """
     if request.method == 'POST':
@@ -400,6 +404,7 @@ def get_alliance_stats(match, alliance):
     return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
 
 @app.route('/setup/event/<event_key>')
+@login_required
 def setup_event(event_key):
     try:
         count = 0
@@ -430,7 +435,18 @@ def setup_export():
     response.headers["Content-Disposition"] = "attachment; filename=kassandra_export.gzip"
     return response
 
-    
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.json.get('password', None) != SECRET:
+            return jsonify(status='ERROR', msg="Bad password!") 
+        login_user('user')
+
+        flask.flash('Logged in successfully.')
+        return flask.redirect('/view/stats')
+    else:
+        return app.send_static_file('login.html')
+
 if __name__ == '__main__':
     app.run()
 
