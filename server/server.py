@@ -2,6 +2,8 @@ from flask import Flask, Response, request, jsonify, url_for, send_from_director
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
 from collections import defaultdict
+from setup import *
+
 import traceback
 import glob
 import json
@@ -395,6 +397,22 @@ def get_alliance_stats(match, alliance):
         return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
+
+@app.route('/setup/event/<event_key>')
+def setup_event(event_key):
+    try:
+        count = 0
+        for match, teams_dict in fetch_tba_match_list(event_key):
+            match_object = Match(match=match, teams_dict=teams_dict)
+            db.session.add(match_object)
+            count += 1
+
+        db.session.commit()
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=traceback.format_exc())
+
+    return jsonify(status='OK', event_key=event_key, count=count)
+
     
 if __name__ == '__main__':
     app.run()
