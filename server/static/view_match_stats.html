@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kassandra</title>
 			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-					<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-					<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
 	<script type="text/javascript">
 	'use strict';
@@ -192,9 +193,10 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 		        	<div ng-show="end_game.scale.teams.length">{{ end_game.scale.teams }}</div>
 		        </div>
 	        </div>
+
 	    </div>
 	    <div class="col-xs-12" ng-show="defences.length">
-	        <h3><span class="glyphicon glyphicon-lock"></span> Defence</h3>
+	        <h3><span class="fa fa-shield"></span> Defence</h3>
 	    	<div class="well-sm bg-info">
 	    		<ol>
 	    			<li ng-repeat="defence in defences">{{ defence.tactic }} on {{ defence.team }} in match {{ defence.match }}</li>
