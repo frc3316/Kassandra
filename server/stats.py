@@ -1,4 +1,5 @@
 import traceback
+import itertools
 
 SIZE_LIST = ['4', '5', '6']
 COLOR_LIST = ['success', 'warning', 'danger']
@@ -236,7 +237,7 @@ class EndGameHandler(object):
 class DefenceHandler(object):
     KEY = "defences"
     def filter(self, match_data):
-        return itertools.chain(*[match['defences'] for match in match_data])
+        return list(itertools.chain(*[match['defences'] for match in match_data]))
 
 
 @statsmgr.register_handler

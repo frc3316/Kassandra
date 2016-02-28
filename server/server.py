@@ -1,5 +1,5 @@
-from flask import Flask, Response, request, jsonify, url_for, send_from_directory, make_response
-from flask.ext.login import login_required, login_user
+from flask import Flask, Response, request, jsonify, url_for, send_from_directory, make_response, flash, redirect
+from flask.ext.login import login_required, login_user, UserMixin, LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
 from collections import defaultdict
@@ -16,15 +16,20 @@ os.chdir('server')
 from stats import statsmgr
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = False
+
+##############################################################################
+## Database Stuff
+##############################################################################
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+if 'DEBUG' in os.environ:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+
 db = SQLAlchemy(app)
 
-DATABASE_DIR = "database"
-SECRET = 'password'
-
-## Postgress Database Stuff
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match = db.Column(db.String(6), unique=True)
@@ -119,7 +124,7 @@ class MatchStats(db.Model):
     scale = db.Column(db.Boolean, default=False)
 
     # Defence
-    defences = db.Column(postgresql.ARRAY(db.Integer))
+    defences = db.Column(db.String(256))#db.Column(postgresql.ARRAY(db.Integer))
 
     def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
         self.match = match
@@ -148,7 +153,7 @@ class MatchStats(db.Model):
             db.session.commit()
             defences.append(match_defence.id)
 
-        self.defences = defences
+        self.defences = ",".join(defences)
 
     def to_dict(self):
         breaching_dict = {}
@@ -174,7 +179,7 @@ class MatchStats(db.Model):
             end_game_dict[key] = getattr(self, key)
 
         defences_list = []
-        if self.defences:
+        if self.defences.split(','):
             for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
                 defences_list.append({'team': defence.attacker, 'tactic': defence.tactic})
 
@@ -190,6 +195,37 @@ class MatchStats(db.Model):
     def __repr__(self):
         return '<MatchStats [Team: %d] [Match: %s]>' % (self.team, self.match)
 
+if 'DEBUG' in os.environ:
+    db.create_all()
+
+##############################################################################
+## User Manager stuff
+##############################################################################
+app.config['SESSION_TYPE'] = 'memcached'
+app.config['SECRET_KEY'] = 'super secret key'  # Be sure to change this before deplyment!
+SECRET = 'password'  # Be sure to change this before deplyment!
+
+class User(UserMixin):
+    def __init__(self, id):
+        self._id = id
+        super(User, self).__init__()
+
+    def get_id(self):
+        return self._id
+
+USER = User(0)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def user_loader(user_id):
+    if user_id == 0:
+        return USER
+
+##############################################################################
+## DB Query Methods
+##############################################################################
 def _db_add_match(match_data):
     match = match_data.pop('match')
     match_object = Match(match=match, teams_dict=match_data)
@@ -236,32 +272,35 @@ def _db_get_match(match):
     for m in Match.query.filter_by(match=match):
         return m.to_dict().get(match)
 
+
+##############################################################################
 ## Flask Server Routes
+##############################################################################
+## Redirects and Directories ENDPOINTS
 @app.route('/img/<path:path>')
 def send_img(path):
+    """ returns images from the img directory """
     return send_from_directory('img', path)
 
+
+@app.route('/favicon.ico')
+def get_favicon():
+    """ returns redirect to favicon """
+    return redirect(url_for('static', filename='favicon.ico'))
+
+
+## Get Data ENDPOINTS
 @app.route('/view/team/<int:team_number>')
-@app.route('/view/match/<match>/<alliance>')
-def view_team_stats(team_number=None, match=None, alliance=None):
+def view_team_stats(team_number):
+    """
+    static return: team match statistics viewing HTML
+    fetches stats using: /stats/team/<team_number>
+    """ 
     return app.send_static_file('view_match_stats.html')
-
-@app.route('/add/match', methods=['GET', 'POST'])
-@login_required
-def add_match():
-    if request.method == 'POST':
-        try:
-            match = _db_add_match(request.json)
-        except Exception, ex:
-            return jsonify(status='ERROR', msg=traceback.format_exc())
-
-        return jsonify(status='OK', match=match.match)
-    else:
-        return app.send_static_file('add_match.html')
 
 @app.route('/matches')
 def get_matches():
-    """ returns the matches list """
+    """ returns the matches list with alliance info """
     try:
         return jsonify(_db_get_matchs())
     except Exception, ex:
@@ -269,31 +308,17 @@ def get_matches():
 
 @app.route('/match/<match>')
 def get_match(match):
-    """ returns the matches list """
+    """ returns the single match alliance info """
     try:
         match_data = _db_get_match(match)
     except Exception, ex:
         return jsonify(status='ERROR', match=match, msg=traceback.format_exc())
 
-    if not match:
+    if not match_data:
         return jsonify(status='ERROR', match=match,
                        msg=("Didn't find match %s." % match))
 
     return jsonify(match_data)
-
-@app.route('/add/stats', methods=['GET', 'POST'])
-@login_required
-def add_match_stats():
-    """ handles and stores new match data """
-    if request.method == 'POST':
-        try:
-            match_stats = _db_add_match_stats(request.json)
-        except Exception, ex:
-            return jsonify(status='ERROR', msg=traceback.format_exc())
-
-        return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
-    else:
-        return app.send_static_file('add_match_stats.html')
 
 @app.route('/stats')
 def get_team_stats_list():
@@ -335,19 +360,6 @@ def get_team_stats_list():
 
     return jsonify(status='OK', teams=teams, matches=matches)
 
-@app.route('/raw/team/<int:team_number>')
-def get_raw_team_stats(team_number):
-    try:
-        matches = _db_get_match_stats(team=team_number)
-    except Exception, ex:
-        return jsonify(status='ERROR', msg=traceback.format_exc())
-
-    if not matches:
-        return jsonify(status='ERROR', team_number=team_number,
-                       msg=("No matches for team %d." % team_number))
-
-    return jsonify(status='OK', team=team_number, matches=matches)
-
 @app.route('/stats/team/<int:team_number>')
 def get_team_stats(team_number):
     """ gets a team's statistics """
@@ -367,53 +379,57 @@ def get_team_stats(team_number):
 
     return jsonify(status='OK', team=team_number, stats=stats)
 
-@app.route('/stats/match/<match>/<alliance>')
-def get_alliance_stats(match, alliance):
-    """ gets a match alliance's statistics """
-    try:
-        match_alliances = _db_get_match(match)
-    except Exception, ex:
-        return jsonify(status='ERROR', msg=traceback.format_exc())
 
-    if match_alliances is None:
-        return jsonify(status='ERROR', match=match, alliance=alliance,
-                       msg=("Match %s does not exist." % match))
-    
-    alliance_teams = match_alliances.get(alliance)
-    if alliance_teams is None:
-        return jsonify(status='ERROR', match=match, alliance=alliance,
-                       msg=("Alliance %s does not exist." % alliance))
-        
-    matches = []
-    for team_number in alliance_teams:
+## Add Data ENDPOINTS
+@app.route('/add/match', methods=['GET', 'POST'])
+@login_required
+def add_match():
+    """ Adds match to match db """
+    if request.method == 'POST':
         try:
-            team_stats = _db_get_match_stats(team=team_number)
-            if team_stats:
-                matches.extend(team_stats)
+            match = _db_add_match(request.json)
         except Exception, ex:
             return jsonify(status='ERROR', msg=traceback.format_exc())
 
-    return jsonify(status='ERROR', match=match, alliance=alliance,
-                   msg=("No stats recorded for teams: %d, %d or %d." % tuple(alliance_teams)))
+        return jsonify(status='OK', match=match.match)
+    else:
+        # static return: team match add HTML
+        # sends info using: /add/match
+        return app.send_static_file('add_match.html')
 
-    try:
-        stats = statsmgr.run_handlers(matches)
-    except Exception, ex:
-        return jsonify(status='ERROR', msg=traceback.format_exc())
+@app.route('/add/stats', methods=['GET', 'POST'])
+@login_required
+def add_match_stats():
+    """ handles and stores new match data """
+    if request.method == 'POST':
+        try:
+            match_stats = _db_add_match_stats(request.json)
+        except Exception, ex:
+            return jsonify(status='ERROR', msg=traceback.format_exc())
 
-    return jsonify(status='OK', match=match, alliance=alliance, stats=stats)
+        return jsonify(status='OK', match=match_stats.match, team=match_stats.team)
+    else:
+        # static return: team match statistics add HTML
+        # sends info using: /add/stats
+        return app.send_static_file('add_match_stats.html')
 
+
+# Setup ENDPOINTS
 @app.route('/setup/event/<event_key>')
 @login_required
 def setup_event(event_key):
+    """ lookup event match list from TheBlueAlliance and load into DB """
     try:
         count = 0
         for match, teams_dict in fetch_tba_match_list(event_key):
+            # This adds matches without overwriting them, duplicates are possible.
             match_object = Match(match=match, teams_dict=teams_dict)
             db.session.add(match_object)
             count += 1
 
         db.session.commit()
+    except ValueError, ex:
+        return jsonify(status='ERROR', msg=ex.message)
     except Exception, ex:
         return jsonify(status='ERROR', msg=traceback.format_exc())
 
@@ -421,6 +437,7 @@ def setup_event(event_key):
 
 @app.route('/setup/export')
 def setup_export():
+    """ Exportes Match Statistics objects as compressed JSON """
     stats = []
     try:
         matches = _db_get_match_stats()
@@ -432,24 +449,29 @@ def setup_export():
     response = make_response(zlib.compress(json_stats))
     
     # Makes the browser recognize this is a download
-    response.headers["Content-Disposition"] = "attachment; filename=kassandra_export.gzip"
+    response.headers["Content-Disposition"] = "attachment; filename=kassandra_export.gz"
     return response
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """ Login page """
     if request.method == 'POST':
         if request.json.get('password', None) != SECRET:
             return jsonify(status='ERROR', msg="Bad password!") 
-        login_user('user')
 
-        flask.flash('Logged in successfully.')
-        return flask.redirect('/view/stats')
+        login_user(USER)  # Only single user support
+
+        return jsonify(status='OK', next='/add/stats')  # redirects to Add Match Statistics page
     else:
+        # Static return: login HTML uses
+        #  - /login - to send password
         return app.send_static_file('login.html')
 
-if __name__ == '__main__':
-    app.run()
 
-    # For favicon
-    app.add_url_rule('/favicon.ico',
-                     redirect_to=url_for('static', filename='favicon.ico'))
+
+##############################################################################
+## Main
+##############################################################################
+if __name__ == '__main__':
+    app.run(debug=('DEBUG' in os.environ))
+

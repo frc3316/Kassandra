@@ -23,6 +23,9 @@
 								if (data.status == 'OK') {
 									$scope.submit_error_msg = null;
 									$scope.submit_ok_msg = 'Logged in successfully!';
+									setTimeout(function () {
+										window.location.href = data.next;
+									})
 								} else {
 									$scope.submit_ok_msg = null;
 									$scope.submit_error_msg = "Error! " + data.msg;
