@@ -132,8 +132,8 @@ class MatchStats(db.Model):
         
         # TODO: This doesn't verify structure. which is slightly bad.
         for key, breach_data in breaching_dict.items():
-            for result, value in breach_data.items():
-                setattr(self, '%s_%s' % (key, result), int(value))
+            for result in ('success', 'failure'):
+                setattr(self, '%s_%s' % (key, result), int(breach_data.get(result, 0)))
 
         for goal, goal_data in shooting_dict.items():
             for distance, distance_data in goal_data.items():
@@ -181,7 +181,7 @@ class MatchStats(db.Model):
         defences_list = []
         if self.defences:
             for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
-                defences_list.append({'team': defence.attacker, 'tactic': defence.tactic})
+                defences_list.append({'team': defence.attacker, 'tactic': defence.tactic, 'match': defence.match})
 
         return {'team': self.team,
                 'match': self.match,
@@ -289,6 +289,12 @@ def get_favicon():
     return redirect(url_for('static', filename='favicon.ico'))
 
 
+@app.route('/')
+def home():
+    """ returns redirect from home to stats view """
+    return redirect(url_for('view_stats'))
+
+
 ## Get Data ENDPOINTS
 @app.route('/view/team/<int:team_number>')
 def view_team_stats(team_number):
@@ -297,6 +303,14 @@ def view_team_stats(team_number):
     fetches stats using: /stats/team/<team_number>
     """ 
     return app.send_static_file('view_match_stats.html')
+
+@app.route('/view')
+def view_stats():
+    """
+    static return: collected statistics viewing HTML
+    fetches stats using: /stats
+    """ 
+    return app.send_static_file('view_stats.html')
 
 @app.route('/matches')
 def get_matches():

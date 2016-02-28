@@ -103,7 +103,8 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
   </head>
   <body ng-controller="kassandraViewCtrlr" style="height:100%;">
   	<div class="col-xs-12 alert alert-danger" ng-show="fetch_error_msg">
-		{{fetch_error_msg}}
+		{{fetch_error_msg}}<br />
+		<a href="/view">go back to stats</a>
 	</div>
 	<div class="well-sm bg-info" ng-show="general.total_matches" style="position:absolute;top:5px;left:5px;z-index:10;opacity:0.8">
 		{{general.total_matches}} Records

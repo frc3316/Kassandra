@@ -45,7 +45,7 @@
 								</div>
 								<div class="row" ng-repeat="(name, stats) in breaching">
 									<div class="form-group" name="{{name}}_defence">
-										<div class="col-xs-4"><label class="control-label" for="{{name}}_success {{name}}_failure">{{ name }}:</label></div>
+										<div class="col-xs-4"><label class="control-label" for="{{name}}_success {{name}}_failure">{{ stats.name }}:</label></div>
 										<div class="col-xs-4">
 											<input class="form-control" type="number" name="{{name}}_success" min="0" max="10" ng-model="stats.success" />
 										</div>
@@ -170,46 +170,57 @@
 							$scope.opposition = '';
 							$scope.breaching = {
 								'a1' : {
+									'name' : 'Portcullis',
 									'success' : 0,
 									'failure' : 0
 								},
 								'a2' : {
+									'name' : 'Cheval de Frise',
 									'success' : 0,
 									'failure' : 0
 								},
 								'b1' : {
+									'name' : 'Ramparts',
 									'success' : 0,
 									'failure' : 0
 								},
 								'b2' : {
+									'name' : 'Moat',
 									'success' : 0,
 									'failure' : 0
 								},
 								'c1' : {
+									'name' : 'Draw Bridge',
 									'success' : 0,
 									'failure' : 0
 								},
 								'c2' : {
+									'name' : 'Sally Port',
 									'success' : 0,
 									'failure' : 0
 								},
 								'c1_assist' : {
+									'name' : 'Draw Bridge Assist',
 									'success' : 0,
 									'failure' : 0
 								},
 								'c2_assist' : {
+									'name' : 'Sally Port Assist',
 									'success' : 0,
 									'failure' : 0
 								},
 								'd1' : {
+									'name' : 'Rock Wall',
 									'success' : 0,
 									'failure' : 0
 								},
 								'd2' : {
+									'name' : 'Rough Terrain',
 									'success' : 0,
 									'failure' : 0
 								},
 								'lb' : {
+									'name' : 'Low Bar',
 									'success' : 0,
 									'failure' : 0
 								}
