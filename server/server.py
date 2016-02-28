@@ -124,7 +124,7 @@ class MatchStats(db.Model):
     scale = db.Column(db.Boolean, default=False)
 
     # Defence
-    defences = db.Column(db.String(256))#db.Column(postgresql.ARRAY(db.Integer))
+    defences = db.Column(postgresql.ARRAY(db.Integer))
 
     def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
         self.match = match
@@ -153,7 +153,7 @@ class MatchStats(db.Model):
             db.session.commit()
             defences.append(match_defence.id)
 
-        self.defences = ",".join(defences)
+        self.defences = defences
 
     def to_dict(self):
         breaching_dict = {}
@@ -179,7 +179,7 @@ class MatchStats(db.Model):
             end_game_dict[key] = getattr(self, key)
 
         defences_list = []
-        if self.defences.split(','):
+        if self.defences:
             for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
                 defences_list.append({'team': defence.attacker, 'tactic': defence.tactic})
 
