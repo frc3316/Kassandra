@@ -1,0 +1,9 @@
+# Developers:
+* barakshelef - Barak Shelef, D-Bug #3316 Mentor
+* Enosh - Enosh Doron, D-Bug #3316 Student
+* rafaels2 - Rafael Sherbu Cohen, D-Bug #3316 Mentor
+
+# Help in design:
+* D-Bug #3316 FRC Team
+
+# Testers and bug fixes:
