@@ -115,17 +115,21 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 	</div>
   	<div class="col-xs-6 half" ng-show="!fetch_error_msg">
     	<h3><span class="glyphicon glyphicon-transfer"></span> Breaching</h3>
-          <div ng-repeat="breach in breaching" class="row well-sm bg-{{breach.color}}">
-          	<div class="col-xs-8">
-          		<h4>{{ breach.name }}</h4>
-          		<div class="h{{breach.size}}">{{ breach.successful }} / {{ breach.attempted }}</div>
-          		<div ng-show="breach.teams.length">{{ breach.teams }}</div>
-          	</div>
-          	<div class="col-xs-4">
-            	<img src="/img/defences/{{ breach.type }}.png" style="float:right;height:75px">
-        	</div>
-          </div>
-    </div>
+      <div ng-repeat="breach in breaching" class="row well-sm bg-{{breach.color}}">
+      	<div class="col-xs-8">
+      		<h4>{{ breach.name }}</h4>
+      		<div class="h{{breach.size}}">{{ breach.successful }} / {{ breach.attempted }}</div>
+      		<div ng-show="breach.teams.length">{{ breach.teams }}</div>
+      	</div>
+      	<div class="col-xs-4">
+        	<img src="/img/defences/{{ breach.type }}.png" style="float:right;height:75px">
+    	  </div>
+      </div>
+      <div ng-if="!breaching" class="center-block">
+        <i class="fa fa-frown-o" style="font-size: 48pt;"></i>
+        <p>Crossed no defences.</p>
+      </div>
+  	</div>
     <div class="col-xs-6 half" ng-show="!fetch_error_msg">
       <h3><span class="glyphicon glyphicon-screenshot"></span> Shooting</h3>
       <div class="row" style="display: flex; align-items: center;">
@@ -163,7 +167,7 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 	          	</div>
 	        </div>
 	      </div>
-        <img src="/img/castle-from-side.svg" style="height: 175px; max-width: 18vw; z-index:-12;"/>
+        <img src="/img/castle-from-side.svg" style="height: 175px; max-width: 18vw; margin: 5px;"/>
       </div>
 	    <div class="col-xs-12">
 	        <h3><span class="glyphicon glyphicon-log-in"></span> Collection</h3>
