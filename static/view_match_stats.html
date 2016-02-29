@@ -200,7 +200,7 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 	        <h3><span class="fa fa-shield"></span> Defence</h3>
 	    	<div class="well-sm bg-info">
 	    		<ol>
-	    			<li ng-repeat="defence in defences">{{ defence.tactic }} on <a href="/stats/team/{{ defence.team }}">{{ defence.team }}</a> in {{ defence.match }}</li>
+	    			<li ng-repeat="defence in defences">{{ defence.tactic }} on <a href="/view/team/{{ defence.team }}">{{ defence.team }}</a> in {{ defence.match }}</li>
 	    		</ol>
 	        </div>
 	    </div>

@@ -11,9 +11,9 @@ import json
 import sys
 import os
 
-os.chdir('server')
-
 from stats import statsmgr
+
+is_debug_mode = ('DEBUG' in os.environ) or ('DEBUG' in sys.argv)
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = False
@@ -23,7 +23,8 @@ app.config['PROPAGATE_EXCEPTIONS'] = False
 ##############################################################################
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-if 'DEBUG' in os.environ:
+if is_debug_mode:
+    # Sqlite for debug mode
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
@@ -31,6 +32,9 @@ else:
 db = SQLAlchemy(app)
 
 class Match(db.Model):
+    """
+    DB Model for match and alliances
+    """
     id = db.Column(db.Integer, primary_key=True)
     match = db.Column(db.String(6), unique=True)
     red1 = db.Column(db.Integer, nullable=False)
@@ -54,6 +58,9 @@ class Match(db.Model):
         return '<Match %r>' % self.match
 
 class MatchDefence(db.Model):
+    """
+    DB Model for match defence tactic
+    """
     id = db.Column(db.Integer, primary_key=True)
     defender = db.Column(db.Integer, nullable=False)
     attacker = db.Column(db.Integer, nullable=False)
@@ -76,6 +83,9 @@ class MatchDefence(db.Model):
         return "<MatchDefence [%d on %d] [Match: %s]>" % (self.defender, self.attacker, self.match)
 
 class MatchStats(db.Model):
+    """
+    DB Model for match statistics, including: breaching, scoring, collection, end game and defense.
+    """
     id = db.Column(db.Integer, primary_key=True)
     match = db.Column(db.String(6), nullable=False)
     team = db.Column(db.Integer, nullable=False)
@@ -124,7 +134,10 @@ class MatchStats(db.Model):
     scale = db.Column(db.Boolean, default=False)
 
     # Defence
-    defences = db.Column(postgresql.ARRAY(db.Integer))
+    if is_debug_mode:
+        defences = db.Column(db.String(250))  # SQLITE doesn't support arrays
+    else:
+        defences = db.Column(postgresql.ARRAY(db.Integer))
 
     def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
         self.match = match
@@ -153,7 +166,10 @@ class MatchStats(db.Model):
             db.session.commit()
             defences.append(match_defence.id)
 
-        self.defences = defences
+        if is_debug_mode:
+            self.defences = ",".join(map(str, defences))
+        else:
+            self.defences = defences
 
     def to_dict(self):
         breaching_dict = {}
@@ -180,7 +196,13 @@ class MatchStats(db.Model):
 
         defences_list = []
         if self.defences:
-            for defence in MatchDefence.query.filter(MatchDefence.id.in_(self.defences)).all():
+            query = MatchDefence.query
+            if is_debug_mode:
+                query = query.filter(MatchDefence.id.in_(map(int, self.defences.split(","))))
+            else:
+                query = query.filter(MatchDefence.id.in_(self.defences))
+
+            for defence in query.all():
                 defences_list.append({'team': defence.attacker, 'tactic': defence.tactic, 'match': defence.match})
 
         return {'team': self.team,
@@ -195,7 +217,8 @@ class MatchStats(db.Model):
     def __repr__(self):
         return '<MatchStats [Team: %d] [Match: %s]>' % (self.team, self.match)
 
-if 'DEBUG' in os.environ:
+if is_debug_mode:
+    # Create all Models in memory DB for tests
     db.create_all()
 
 ##############################################################################
@@ -213,7 +236,7 @@ class User(UserMixin):
     def get_id(self):
         return self._id
 
-USER = User(0)
+USER = User(0)  # Currently only supports a single user.
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -487,5 +510,5 @@ def login():
 ## Main
 ##############################################################################
 if __name__ == '__main__':
-    app.run(debug=('DEBUG' in os.environ))
+    app.run(debug=is_debug_mode)
 
