@@ -217,9 +217,7 @@ class MatchStats(db.Model):
     def __repr__(self):
         return '<MatchStats [Team: %d] [Match: %s]>' % (self.team, self.match)
 
-if is_debug_mode:
-    # Create all Models in memory DB for tests
-    db.create_all()
+db.create_all(checkfirst=True)  # Only create non existing tables of the default MetaData
 
 ##############################################################################
 ## User Manager stuff
