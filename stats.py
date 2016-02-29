@@ -81,7 +81,7 @@ class GoalsScored(StatsHandler):
         stats['attempted'] = '%.2f' % (total_shots / amount)
         stats['size'] = GoalsScored.AMOUNT_GRANULATOR.get(total_shots)
         stats['color'] = GoalsScored.PERCENTAGE_GRANULATOR.get(total_scored / total_shots)
-        stats['variant'] = GoalsScored.HIGH_VARIANCE < GoalsScored._variance([float(s) / (s + f) for (s, f) in zip(success, failure)])
+        stats['variant'] = GoalsScored.HIGH_VARIANCE < GoalsScored._variance([float(s) / (s + f) if (s + f) else 0 for (s, f) in zip(success, failure)])
         
         return stats
         
@@ -138,7 +138,7 @@ class DefencesCrossed(StatsHandler):
         stats['attempted'] = '%.2f' % (total_breaches / amount)
         stats['size'] = DefencesCrossed.AMOUNT_GRANULATOR.get(total_breaches)
         stats['color'] = DefencesCrossed.PERCENTAGE_GRANULATOR.get(total_crossed / total_breaches)
-        stats['variant'] = DefencesCrossed.HIGH_VARIANCE < DefencesCrossed._variance([float(s) / (s + f) for (s, f) in zip(success, failure)])
+        stats['variant'] = DefencesCrossed.HIGH_VARIANCE < DefencesCrossed._variance([float(s) / (s + f) if (s + f) else 0 for (s, f) in zip(success, failure)])
         
         return stats
         
