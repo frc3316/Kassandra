@@ -309,7 +309,7 @@ def send_img(path):
 @app.route('/favicon.ico')
 def get_favicon():
     """ returns redirect to favicon """
-    return redirect(url_for('static', filename='favicon.ico'))
+    return redirect('/img/favicon.ico')
 
 
 @app.route('/')
