@@ -217,7 +217,7 @@ class MatchStats(db.Model):
     def __repr__(self):
         return '<MatchStats [Team: %d] [Match: %s]>' % (self.team, self.match)
 
-db.create_all(checkfirst=True)  # Only create non existing tables of the default MetaData
+db.create_all()  # Only create non existing tables of the default MetaData
 
 ##############################################################################
 ## User Manager stuff
