@@ -211,7 +211,8 @@ class MatchStats(db.Model):
                 'shooting': shooting_dict,
                 'collection': collection_dict,
                 'end_game': end_game_dict,
-                'defences': defences_list}
+                'defences': defences_list,
+                'id': self.id}
         
 
     def __repr__(self):
@@ -270,13 +271,15 @@ def _db_add_match_stats(match_stats_data):
     db.session.commit()
     return match_stats_object
 
-def _db_get_match_stats(team=None, match=None):
+def _db_get_match_stats(team=None, match=None, id=None):
     """ Fetch team's match datas from DB """
     query = MatchStats.query
     if team is not None:
         query = query.filter(MatchStats.team == team)
     if match is not None:
         query = query.filter(MatchStats.match == match)
+    if id is not None:
+        query = query.filter(MatchStats.id == id)
     return [stats.to_dict() for stats in query.all()]
 
 def _db_get_matchs():
@@ -317,11 +320,12 @@ def home():
 
 
 ## Get Data ENDPOINTS
+@app.route('/view/id/<int:match_id>')
 @app.route('/view/team/<int:team_number>')
-def view_team_stats(team_number):
+def view_team_stats(team_number=None, match_id=None):
     """
     static return: team match statistics viewing HTML
-    fetches stats using: /stats/team/<team_number>
+    fetches stats using: /stats/id/<team_number> or /stats/team/<team_number>
     """ 
     return app.send_static_file('view_match_stats.html')
 
@@ -365,14 +369,11 @@ def get_team_stats_list():
         return jsonify(status='ERROR', msg=traceback.format_exc())
 
     # Populate base dicts
-    stats_by_team = {}
-    stats_by_match = {}
-    for match, alliances in match_list.items():
-        stats_by_match[match] = {}
-        for alliance, teams in alliances.items():
-            stats_by_match[match][alliance] = 0
-            for team in teams:
-                stats_by_team[team] = 0
+    stats_by_team = defaultdict(int)
+    for match in match_list.keys():
+        match_list[match]['red'] = dict.fromkeys(match_list[match]['red'])
+        match_list[match]['blue'] = dict.fromkeys(match_list[match]['blue'])
+        match_list[match]['count'] = 0
 
     # Populate dicts with actual data
     for match_stats in collected_stats:
@@ -382,16 +383,17 @@ def get_team_stats_list():
             continue   # Illegal match stats entry...
 
         if team in match_list[match]['red']:
-            stats_by_match[match]['red'] += 1
+            match_list[match]['red'][team] = match_stats['id']
         elif team in match_list[match]['blue']:
-            stats_by_match[match]['blue'] += 1
+            match_list[match]['blue'][team] = match_stats['id']
         else:
             continue  # Illegal match stats entry...
 
+        match_list[match]['count'] += 1
         stats_by_team[team] += 1
         
     teams = sorted(stats_by_team.items())
-    matches = sorted(stats_by_match.items())
+    matches = match_list
 
     return jsonify(status='OK', teams=teams, matches=matches)
 
@@ -413,6 +415,25 @@ def get_team_stats(team_number):
         return jsonify(status='ERROR', msg=traceback.format_exc())
 
     return jsonify(status='OK', team=team_number, stats=stats)
+
+@app.route('/stats/id/<int:match_id>')
+def get_id_stats(match_id):
+    """ gets a team's statistics """
+    try:
+        match = _db_get_match_stats(id=match_id)
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=traceback.format_exc())
+
+    if not match:
+        return jsonify(status='ERROR', id=match_id,
+                       msg=("Couldn't find match ID %d." % match_id))
+
+    try:
+        stats = statsmgr.run_handlers(match)
+    except Exception, ex:
+        return jsonify(status='ERROR', msg=traceback.format_exc())
+
+    return jsonify(status='OK', team=match[0]['team'], stats=stats)
 
 
 ## Add Data ENDPOINTS

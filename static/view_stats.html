@@ -32,12 +32,25 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 		};
 	});
 	// $scope.teams = [[1,2],[3,4],[5,6]];
-	// $scope.matches = [[1,{'red':[2,3,4], 'blue':[5,6,7]}],[8,{'red':[9,10,11],'blue':[12,13,14]}]];
+	// $scope.matches = {1: {'red': {2: 10, 3: 11, 4: 12},
+	//                       'blue': {5: 13, 6: 14, 7: 15},
+	//                       'count': 6},
+	//                   8: {'red': {9: null, 10: 17, 11: 18},
+	//                       'blue': {12: 19, 13: null, 14: 21},
+	//                   	  'count': 4},
+	//                   	  9: {'red': {16: null, 17: null, 18: null},
+	//                   	  'blue': {19: null, 20: null, 21: null},
+	//                   	  'count': 0}
+	//                   	};
 });
-Kassandra.filter('iif', function () {
-   return function(input, trueValue) {
-   		if (input) {
-   			return trueValue;
+Kassandra.filter('color', function () {
+   return function(match) {
+   		if (match['count'] == 0) {
+   			return '';
+   		} else if ((match['count'] > 0) && (match['count'] < 6)) {
+   			return 'warning';
+   		} else {
+   			return 'success';
    		}
    };
 });
@@ -69,6 +82,9 @@ Kassandra.filter('iif', function () {
       		padding-left: 5px;
       		padding-right: 5px;
       	}
+      	th {
+      		text-align: center;
+      	}
       </style>
 	
   </head>
@@ -99,15 +115,21 @@ Kassandra.filter('iif', function () {
 			<thead>
 				<tr>
 					<th>Match</th>
-					<th>Red Alliance</th>
-					<th>Blue Alliance</th>
+					<th colspan="3">Red Alliance</th>
+					<th colspan="3">Blue Alliance</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="match in matches" class="{{ ((match[1].red + match[1].blue) == 6) | iif : 'success' }}">
-					<td>{{ match[0] }}</td>
-					<td>{{ match[1].red }}</td>
-					<td>{{ match[1].blue }}</td>
+				<tr ng-repeat="(number, alliances) in matches" class="{{ alliances | color }}">
+					<td>{{ number }}</td>
+					<td ng-repeat="(team, id) in alliances['red']">
+						<span ng-if="id"><a href="/view/id/{{ id }}">{{ team }}</a> <span class="glyphicon glyphicon-ok" style="color: green; font-size: small;"></span></span>
+						<span ng-if="!id">{{ team }}</span>
+					</td>
+					<td ng-repeat="(team, id) in alliances['blue']">
+						<span ng-if="id"><a href="/view/id/{{ id }}">{{ team }}</a> <span class="glyphicon glyphicon-ok" style="color: green; font-size: small;"></span></span>
+						<span ng-if="!id">{{ team }}</span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
