@@ -133,13 +133,18 @@ class MatchStats(db.Model):
     challenge = db.Column(db.Boolean, default=False)
     scale = db.Column(db.Boolean, default=False)
 
+    # Auto
+    reach = db.Column(db.Boolean, default=False)
+    cross = db.Column(db.Boolean, default=False)
+    score = db.Column(db.Boolean, default=False)
+
     # Defence
     if is_debug_mode:
         defences = db.Column(db.String(250))  # SQLITE doesn't support arrays
     else:
         defences = db.Column(postgresql.ARRAY(db.Integer))
 
-    def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, end_game_dict, defences_list):
+    def __init__(self, match, team, breaching_dict, shooting_dict, collection_dict, auton_dict, end_game_dict, defences_list):
         self.match = match
         self.team = team
         
@@ -155,6 +160,9 @@ class MatchStats(db.Model):
 
         for key, value in collection_dict.items():
             setattr(self, key, int(value))
+
+        for key, value in auton_dict.items():
+            setattr(self, key, bool(value))
 
         for key, value in end_game_dict.items():
             setattr(self, key, bool(value))
@@ -190,6 +198,10 @@ class MatchStats(db.Model):
         for key in ('floor', 'hp'):
             collection_dict[key] = getattr(self, key)
 
+        auton_dict = {}
+        for key in ('reach', 'cross', 'score'):
+            auton_dict[key] = getattr(self, key)
+
         end_game_dict = {}
         for key in ('challenge', 'scale'):
             end_game_dict[key] = getattr(self, key)
@@ -210,6 +222,7 @@ class MatchStats(db.Model):
                 'breaching': breaching_dict,
                 'shooting': shooting_dict,
                 'collection': collection_dict,
+                'auton': auton_dict,
                 'end_game': end_game_dict,
                 'defences': defences_list,
                 'id': self.id}
@@ -262,11 +275,12 @@ def _db_add_match_stats(match_stats_data):
     breaching = match_stats_data.pop('breaching')
     shooting = match_stats_data.pop('shooting')
     collection = match_stats_data.pop('collection')
+    auton = match_stats_data.pop('auton')
     end_game = match_stats_data.pop('end_game')
     defences = match_stats_data.pop('defences')
     
     match_stats_object = MatchStats(match=match, team=team, breaching_dict=breaching, shooting_dict=shooting,
-                                    collection_dict=collection, end_game_dict=end_game, defences_list=defences)
+                                    collection_dict=collection, auton_dict=auton, end_game_dict=end_game, defences_list=defences)
     db.session.add(match_stats_object)
     db.session.commit()
     return match_stats_object

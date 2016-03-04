@@ -199,6 +199,48 @@ class CollectionHandler(object):
 
 
 @statsmgr.register_handler
+class AutonHandler(object):
+    KEY = "auton"
+
+    HIGH_AMOUNT = 4
+    MED_AMOUNT = 2
+    AMOUNT_GRANULATOR = Granulator([HIGH_AMOUNT, MED_AMOUNT], SIZE_LIST)
+
+    HIGH_PERCENTAGE = 0.66
+    MED_PERCENTAGE = 0.34
+    PERCENTAGE_GRANULATOR = Granulator([HIGH_PERCENTAGE,
+                                        MED_PERCENTAGE], COLOR_LIST)
+
+    def filter(self, match_data):
+        reach_data = [match['auton']['reach'] for match in match_data]
+        cross_data = [match['auton']['cross'] for match in match_data]
+        score_data = [match['auton']['score'] for match in match_data]
+        
+        amount = len(match_data)
+        total_reach = float(sum(reach_data))
+        reach_percentage = total_reach / amount
+        total_cross = float(sum(cross_data))
+        cross_percentage = total_cross / amount
+        total_score = float(sum(score_data))
+        score_percentage = total_score / amount
+
+        stats = {'reach': {}, 'cross': {}, 'score': {}}
+        stats['reach']['color'] = self.PERCENTAGE_GRANULATOR.get(reach_percentage)
+        stats['reach']['percentage'] = '%.0f%%' % (reach_percentage * 100)
+        stats['reach']['size'] = self.AMOUNT_GRANULATOR.get(total_reach)
+
+        stats['cross']['color'] = self.PERCENTAGE_GRANULATOR.get(cross_percentage)
+        stats['cross']['percentage'] = '%.0f%%' % (cross_percentage * 100)
+        stats['cross']['size'] = self.AMOUNT_GRANULATOR.get(total_cross)
+
+        stats['score']['color'] = self.PERCENTAGE_GRANULATOR.get(score_percentage)
+        stats['score']['percentage'] = '%.0f%%' % (score_percentage * 100)
+        stats['score']['size'] = self.AMOUNT_GRANULATOR.get(total_score)
+
+        return stats
+
+
+@statsmgr.register_handler
 class EndGameHandler(object):
     KEY = "end_game"
 

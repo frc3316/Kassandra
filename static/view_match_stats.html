@@ -35,35 +35,40 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 			$scope.breaching = response.data.stats.breaching;
 			$scope.shooting = response.data.stats.shooting;
 			$scope.collection = response.data.stats.collection;
+			$scope.auton = response.data.stats.auton;
 			$scope.end_game = response.data.stats.end_game;
 			$scope.defences = response.data.stats.defences;
 			$scope.general = response.data.stats.general;
 		};
 	});
  // $scope.breaching  = [
- // {name:"Portcullis", type:"a1", successful:14, attempted:32, size:4, color:"danger", teams: [1,2,3]},
- // {name:"Moat", type:"b2", successful:8, attempted:26, size:5, color:"success", teams: [1,2,3]},
- // {name:"Sally Port", type:"c2_assist", successful:6, attempted:26, size:5, color:"warning", teams: [1,2,3]},
- // {name:"Ramparts", type:"b1", successful:2, attempted:15, size:6, color:"success", teams: [1,2,3]},
- // {name:"Rock Wall", type:"d2", successful:2, attempted:11, size:6, color:"success", teams: [1,2,3]},
+ // {name:"Portcullis", type:"a1", successful:14, attempted:32, size:4, color:"danger", teams: []},
+ // {name:"Moat", type:"b2", successful:8, attempted:26, size:5, color:"success", teams: []},
+ // {name:"Sally Port", type:"c2_assist", successful:6, attempted:26, size:5, color:"warning", teams: []},
+ // {name:"Ramparts", type:"b1", successful:2, attempted:15, size:6, color:"success", teams: []},
+ // {name:"Rock Wall", type:"d2", successful:2, attempted:11, size:6, color:"success", teams: []},
  // ];
- //
+ 
  // $scope.shooting = {
  // 	high: {
- // 		far:   {successful:6, attempted:7, size:4, color: "success", teams: [1,2,3], variant: true},
- // 		close: {successful:0, attempted:0.7, size:6, color: "danger", teams: [1,2,3], variant: false}
+ // 		far:   {successful:6, attempted:7, size:4, color: "success", teams: [], variant: true},
+ // 		close: {successful:0, attempted:0.7, size:6, color: "danger", teams: [], variant: false}
  // 	},
  // 	low : {
- // 		far:   {successful:0, attempted:0, size:6, color: "danger", teams: [1,2,3], variant: false},
- // 		close: {successful:2, attempted:4, size:5, color: "warning", teams: [1,2,3], variant: false}
+ // 		far:   {successful:0, attempted:0, size:6, color: "danger", teams: [], variant: false},
+ // 		close: {successful:2, attempted:4, size:5, color: "warning", teams: [], variant: false}
  // 	}
  // };
 
- // $scope.collection = {floor: {color: "success", amount: 5, size:5, teams: [1,2,3]},
- //                      hp: {color: "warning", amount: 1, size: 5, teams: [1,2,3]}};
+ // $scope.collection = {floor: {color: "success", amount: 5, size:5, teams: []},
+ //                      hp: {color: "warning", amount: 1, size: 5, teams: []}};
 
- // $scope.end_game = {scale:     {color: "success", percentage: '47.0%', size: 4, teams: [1,2]},
- //                    challenge: {color: "warning", percentage: '10.33%', size: 6, teams: [3]}};
+ // $scope.auton = {reach: {color: "success", percentage: '47.0%', size: 4, teams: []},
+ // 				 cross: {color: "warning", percentage: '22.0%', size: 6, teams: []},
+ // 				 score: {color: "success", percentage: '87.0%', size: 5, teams: []}};
+
+ // $scope.end_game = {scale:     {color: "success", percentage: '47.0%', size: 4, teams: []},
+ //                    challenge: {color: "warning", percentage: '10.33%', size: 6, teams: []}};
 
  // $scope.defences = [
  // 	{tactic: "Pinning", team: 2315, match: 'Q1'},
@@ -181,6 +186,27 @@ Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
 	        	<div class="well-sm bg-{{collection.hp.color}}">
 		        	<span class="glyphicon glyphicon-user" style="float:left"></span><span class="h{{collection.hp.size}}">{{collection.hp.amount}}</span>
 		        	<div ng-show="collection.hp.teams.length">{{ collection.hp.teams }}</div>
+		        </div>
+	        </div>
+	    </div>
+	    <div class="col-xs-12">
+	        <h3><span class="fa fa-magic"></span> Autonomous</h3>
+	        <div class="col-xs-4 tight">
+	        	<div class="well-sm bg-{{auton.reach.color}}">
+		        	<span class="fa fa-map-marker" style="float:left"></span><span class="h{{auton.reach.size}}">{{auton.reach.percentage}}</span>
+		        	<div ng-show="end_game.reach.teams.length">{{ auton.reach.teams }}</div>
+		        </div>
+	        </div>
+	        <div class="col-xs-4 tight">
+	        	<div class="well-sm bg-{{auton.cross.color}}">
+		        	<span class="glyphicon glyphicon-transfer" style="float:left"></span><span class="h{{auton.cross.size}}">{{auton.cross.percentage}}</span>
+		        	<div ng-show="end_game.cross.teams.length">{{ auton.cross.teams }}</div>
+		        </div>
+	        </div>
+	        <div class="col-xs-4 tight">
+	        	<div class="well-sm bg-{{auton.score.color}}">
+		        	<span class="glyphicon glyphicon-screenshot" style="float:left"></span><span class="h{{auton.score.size}}">{{auton.score.percentage}}</span>
+		        	<div ng-show="end_game.score.teams.length">{{ auton.score.teams }}</div>
 		        </div>
 	        </div>
 	    </div>
