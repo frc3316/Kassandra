@@ -96,11 +96,25 @@ class GoalsScored(StatsHandler):
         low_close_failure = [match['low']['close']['failure'] for match in shooting_data]
         high_close_success = [match['high']['close']['success'] for match in shooting_data]
         high_close_failure = [match['high']['close']['failure'] for match in shooting_data]
+
+        low_success = map(sum, zip(low_far_success, low_close_success))
+        low_failure = map(sum, zip(low_far_failure, low_close_failure))
+        high_success = map(sum, zip(high_far_success, high_close_success))
+        high_failure = map(sum, zip(high_far_failure, high_close_failure))
+        
+        total_success = map(sum, zip(high_success, low_success))
+        total_failure = map(sum, zip(high_failure, low_failure))
+        
+
         
         return dict(low=dict(far=GoalsScored._run_stats(low_far_success, low_far_failure),
-                             close=GoalsScored._run_stats(low_close_success, low_close_failure)),
+                             close=GoalsScored._run_stats(low_close_success, low_close_failure),
+                             **GoalsScored._run_stats(low_success, low_failure)),
                     high=dict(far=GoalsScored._run_stats(high_far_success, high_far_failure),
-                              close=GoalsScored._run_stats(high_close_success, high_close_failure)))
+                              close=GoalsScored._run_stats(high_close_success, high_close_failure),
+                              **GoalsScored._run_stats(high_success, high_failure)),
+                    **GoalsScored._run_stats(total_success, total_failure))
+
 @statsmgr.register_handler        
 class DefencesCrossed(StatsHandler):
     KEY = "breaching"
@@ -194,6 +208,10 @@ class CollectionHandler(object):
         stats['hp']['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(per_game_hp)
         stats['hp']['amount'] = '%.2f' % per_game_hp
         stats['hp']['size'] = self.AMOUNT_GRANULATOR.get(total_hp)
+
+        stats['color'] = self.AMOUNT_PER_GAME_GRANULATOR.get(per_game_hp + per_game_floor)
+        stats['amount'] = '%.2f' % (per_game_hp + per_game_floor)
+        stats['size'] = self.AMOUNT_GRANULATOR.get(total_hp + total_floor)        
 
         return stats
 

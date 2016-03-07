@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html ng-app="Kassandra" lang="en" style="height:100%;">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kassandra</title>
+			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<script type="text/javascript">
+	'use strict';
+
+/* Controllers */
+
+var Kassandra = angular.module('Kassandra', []);
+
+Kassandra.controller('kassandraViewCtrlr', function($scope, $http) {
+	var statsRequestPath = window.location.pathname.replace('view', 'stats');
+	$http.get(statsRequestPath)
+	.then(function(response) {
+		if (response.data.status != 'OK') {
+			$scope.fetch_error_msg = "Error! " + response.data.msg;
+		} else {
+			$scope.fetch_error_msg = null;
+			
+	        $scope.teams_by_total_ppg = response.data.teams_by_total_ppg;
+	        $scope.teams_by_shooting_ppg = response.data.teams_by_shooting_ppg;
+	        $scope.teams_by_crossing_ppg = response.data.teams_by_crossing_ppg;
+	        $scope.teams_by_auton_ppg = response.data.teams_by_auton_ppg;
+	        $scope.teams_by_end_game_ppg = response.data.teams_by_end_game_ppg;
+	        $scope.teams_by_collections_pg = response.data.teams_by_collections_pg;
+	        $scope.teams_by_defencive_records = response.data.teams_by_defencive_records;
+		};
+	});
+	// $scope.teams = [[1,2],[3,4],[5,6]];
+	// $scope.matches = {1: {'red': {2: 10, 3: 11, 4: 12},
+	//                       'blue': {5: 13, 6: 14, 7: 15},
+	//                       'count': 6},
+	//                   8: {'red': {9: null, 10: 17, 11: 18},
+	//                       'blue': {12: 19, 13: null, 14: 21},
+	//                   	  'count': 4},
+	//                   	  9: {'red': {16: null, 17: null, 18: null},
+	//                   	  'blue': {19: null, 20: null, 21: null},
+	//                   	  'count': 0}
+	//                   	};
+});
+
+</script>
+
+      <style type="text/css">
+        body {
+        	text-align: center;
+        }
+      	h4 {
+      		margin-top: 5px;
+      	}
+      	.glyphicon {
+      		font-size: 20px;
+      	}
+      	.well-sm {
+      		border-radius: 16px;
+      	}
+      	.row {
+      		margin-bottom: 5px;
+      		margin-top: 5px;
+      	}
+      	.half {
+      		overflow: auto;
+      		height: 95%;
+      	}
+      	.tight {
+      		padding-left: 5px;
+      		padding-right: 5px;
+      	}
+      	th {
+      		text-align: center;
+      	}
+      </style>
+	
+  </head>
+  <body ng-controller="kassandraViewCtrlr" style="height:100%;">
+  	<div class="col-xs-12 alert alert-danger" ng-show="fetch_error_msg">
+		{{fetch_error_msg}}
+	</div>
+	<div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Total</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PPG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_total_ppg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Shooting</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PPG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_shooting_ppg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Crossing</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PPG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_crossing_ppg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Autonomous</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PPG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_auton_ppg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>End Game</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PPG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_end_game_ppg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Collections</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>PG</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_collections_pg">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+    <div class="col-xs-4" ng-show="!fetch_error_msg">
+    	<h3>Defensive</h3>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Team #</th>
+					<th>Records</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="team in teams_by_defencive_records">
+					<td><a href="/view/team/{{ team[0] }}">{{ team[0] }}</a></td>
+					<td>{{ team[1] }}</td>
+				</tr>
+			</tbody>
+		</table>
+    </div>
+	<footer class="footer" style="text-align:center;width:100%;">
+		<p class="text-muted small">Brought to you with love by D-Bug #3316</p>
+	</footer>
+  </body>
+</html>

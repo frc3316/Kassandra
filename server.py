@@ -310,6 +310,10 @@ def _db_get_match(match):
     for m in Match.query.filter_by(match=match):
         return m.to_dict().get(match)
 
+def _db_get_teams():
+    """ Fetch all teams we have stats on """
+    return [r[0] for r in MatchStats.query.with_entities(MatchStats.team).group_by(MatchStats.team).all()]
+
 
 ##############################################################################
 ## Flask Server Routes
@@ -342,6 +346,14 @@ def view_team_stats(team_number=None, match_id=None):
     fetches stats using: /stats/id/<team_number> or /stats/team/<team_number>
     """ 
     return app.send_static_file('view_match_stats.html')
+
+@app.route('/view/report')
+def view_report():
+    """
+    static return: collected statistics report HTML
+    fetches stats using: /stats/report
+    """ 
+    return app.send_static_file('view_report.html')
 
 @app.route('/view')
 def view_stats():
@@ -449,6 +461,67 @@ def get_id_stats(match_id):
 
     return jsonify(status='OK', team=match[0]['team'], stats=stats)
 
+@app.route('/stats/report')
+def get_teams_report():
+    """ produce a compared report of TOP 24 teams by:
+    1. Total PPG
+        a. Shooting PPG (with top / bottom amount)
+        b. Crossings PPG (with which defences are over 75%)
+        c. End-Game PPG
+        d. Auton PPG
+    2. Crossing success percentage (per defense) 
+    3. Collections per game (with floor / HP amount)
+    4. Defensive records
+    """
+    def filter_and_sort(stats, argument, amount=24):
+        filtered_stats = [(t, s[argument]) for (t, s) in stats]
+        return sorted(filtered_stats, key=lambda s: s[1], reverse=True)[:24]
+
+    teams_stats = dict.fromkeys(_db_get_teams())
+    for team in teams_stats.keys():
+        try:
+            team_matches = _db_get_match_stats(team=team)
+            stats = statsmgr.run_handlers(team_matches)
+        except Exception, ex:
+            return jsonify(status='ERROR', msg=traceback.format_exc())
+
+        crossing_breakdown = {defense_stats['name']: min(float(defense_stats['successful']), 2) for defense_stats in stats['breaching']}
+        shooting_ppg = float(stats['shooting']['low']['successful']) * 3 + float(stats['shooting']['high']['successful']) * 5
+        crossing_ppg = sum([v * 5 for v in crossing_breakdown.values()])
+        auton_ppg = float(stats['auton']['reach']['percentage'][:-1]) / 100 * 2 + float(stats['auton']['cross']['percentage'][:-1]) / 100 * 10  + float(stats['auton']['score']['percentage'][:-1]) / 100 * 10
+        end_game_ppg = float(stats['end_game']['challenge']['percentage'][:-1]) / 100 * 5 + float(stats['end_game']['scale']['percentage'][:-1]) / 100 * 15
+        
+        teams_stats[team] = dict(
+            shooting_ppg = shooting_ppg,
+            crossing_breakdown = crossing_breakdown,
+            crossing_ppg = crossing_ppg,
+            auton_ppg = auton_ppg,
+            end_game_ppg = end_game_ppg,
+            total_ppg = (shooting_ppg + crossing_ppg + auton_ppg + end_game_ppg),
+            collections_pg = float(stats['collection']['amount']),
+            defencive_records = len(stats['defences'])
+        )
+
+    teams_stats = teams_stats.items()
+
+    teams_by_total_ppg = filter_and_sort(teams_stats, 'total_ppg')
+    teams_by_shooting_ppg = filter_and_sort(teams_stats, 'shooting_ppg')
+    teams_by_crossing_ppg = filter_and_sort(teams_stats, 'crossing_ppg')
+    teams_by_auton_ppg = filter_and_sort(teams_stats, 'auton_ppg')
+    teams_by_end_game_ppg = filter_and_sort(teams_stats, 'end_game_ppg')
+
+    teams_by_collections_pg = filter_and_sort(teams_stats, 'collections_pg')
+    teams_by_defencive_records = filter_and_sort(teams_stats, 'defencive_records')
+
+    return jsonify(status='OK',
+        teams_by_total_ppg = filter_and_sort(teams_stats, 'total_ppg'),
+        teams_by_shooting_ppg = filter_and_sort(teams_stats, 'shooting_ppg'),
+        teams_by_crossing_ppg = filter_and_sort(teams_stats, 'crossing_ppg'),
+        teams_by_auton_ppg = filter_and_sort(teams_stats, 'auton_ppg'),
+        teams_by_end_game_ppg = filter_and_sort(teams_stats, 'end_game_ppg'),
+        teams_by_collections_pg = filter_and_sort(teams_stats, 'collections_pg'),
+        teams_by_defencive_records = filter_and_sort(teams_stats, 'defencive_records')
+    )
 
 ## Add Data ENDPOINTS
 @app.route('/add/match', methods=['GET', 'POST'])
